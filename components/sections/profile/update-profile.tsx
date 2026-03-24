@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -35,7 +36,7 @@ const updateProfileSchema = z.object({
     .length(10, "Регистрийн дугаар 10 оронтой байх ёстой")
     .transform((val) => val.toUpperCase()) // Transform first
     .pipe(
-      z.string().regex(/^[А-ЯӨҮ]{2}\d{8}$/, "Регистрийн дугаар буруу байна")
+      z.string().regex(/^[А-ЯӨҮ]{2}\d{8}$/, "Регистрийн дугаар буруу байна"),
     ),
   username: z.string().min(1, "Нэр оруулна уу"),
   phone: z
@@ -50,11 +51,11 @@ const updateProfileSchema = z.object({
         .instanceof(File)
         .refine(
           (file) => file.size <= MAX_FILE_SIZE,
-          `Зургийн хэмжээ 5MB-аас бага байх ёстой`
+          `Зургийн хэмжээ 5MB-аас бага байх ёстой`,
         )
         .refine(
           (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
-          "Зөвхөн JPG, PNG, WEBP өргөтгөлтэй зураг оруулна уу"
+          "Зөвхөн JPG, PNG, WEBP өргөтгөлтэй зураг оруулна уу",
         ),
       z.string(),
     ])
@@ -205,10 +206,14 @@ export function UpdateProfile({ profile, onCancel }: UpdateProfileProps) {
                   {/* Show existing image if available */}
                   {typeof value === "string" && value && (
                     <div className="mb-2">
-                      <img
+                      <Image
                         src={value}
                         alt="Profile"
+                        width={80}
+                        height={80}
                         className="w-20 h-20 object-cover rounded-full"
+                        unoptimized
+                        priority
                       />
                     </div>
                   )}

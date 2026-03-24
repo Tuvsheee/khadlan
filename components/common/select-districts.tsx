@@ -39,13 +39,13 @@ const SelectDistricts = ({
   defaultBagKhoroo,
 }: SelectDistrictsProps) => {
   const [selectedProvince, setSelectedProvince] = useState<string>(
-    defaultProvince?._id || ""
+    defaultProvince?._id || "",
   );
   const [selectedDistrict, setSelectedDistrict] = useState<string>(
-    defaultDistrict?._id || ""
+    defaultDistrict?._id || "",
   );
   const [selectedBagKhoroo, setSelectedBagKhoroo] = useState<string>(
-    defaultBagKhoroo?._id || ""
+    defaultBagKhoroo?._id || "",
   );
 
   // Add useEffect to trigger initial values
@@ -59,7 +59,14 @@ const SelectDistricts = ({
     if (defaultBagKhoroo?._id) {
       onBagKhorooChange?.(defaultBagKhoroo._id);
     }
-  }, [defaultProvince, defaultDistrict, defaultBagKhoroo]);
+  }, [
+    defaultProvince,
+    defaultDistrict,
+    defaultBagKhoroo,
+    onProvinceChange,
+    onDistrictChange,
+    onBagKhorooChange,
+  ]);
 
   // Fetch provinces
   const { data: provinces, isLoading: isLoadingProvinces } =
