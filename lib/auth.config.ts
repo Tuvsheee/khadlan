@@ -1,12 +1,11 @@
-import { NextAuthOptions } from "next-auth";
-import CredentialProvider from "next-auth/providers/credentials";
+import type { NextAuthConfig } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import { api } from "./api";
 
-const authConfig: NextAuthOptions = {
-  debug: process.env.NODE_ENV === "development",
+const authConfig: NextAuthConfig = {
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
-    CredentialProvider({
+    Credentials({
       credentials: {
         username: {
           type: "text",
@@ -38,7 +37,7 @@ const authConfig: NextAuthOptions = {
           throw new Error(
             error.response?.data?.message ||
               error.message ||
-              "Authentication failed"
+              "Authentication failed",
           );
         }
       },
@@ -78,6 +77,6 @@ const authConfig: NextAuthOptions = {
   session: {
     maxAge: 60 * 60 * 24, // 1 day
   },
-} satisfies NextAuthOptions;
+};
 
 export default authConfig;
