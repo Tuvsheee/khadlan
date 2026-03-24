@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "api.khadlan.mn",
+        hostname: "hadlan.tanusoft.mn",
       },
     ],
   },
