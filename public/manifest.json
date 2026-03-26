@@ -1,0 +1,19 @@
+{
+  "name": "Khadlan.mn",
+  "short_name": "Khadlan",
+  "description": "Улсын хадлан системийн үйл ажиллагааг дэмжих хэлэлцүүлэг ба хүсэлтүүдийн платформ",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["productivity", "government"],
+  "screenshots": []
+}

@@ -56,5 +56,57 @@ export const siteConfig: Metadata = {
     template: "%s | Khadlan.mn",
     default: "Khadlan.mn",
   },
-  description: "Khadlan.mn",
+  description:
+    "Khadlan.mn - Улсын хадлан системийн үйл ажиллагааг дэмжих хэлэлцүүлэг ба хүсэлтүүдийн платформ",
+  keywords: [
+    "Хадлан",
+    "Хүсэлт",
+    "Сумд",
+    "Баг хороо",
+    "Улсын үйлчилгээ",
+    "Mongolia",
+  ],
+  authors: [{ name: "Khadlan Team" }],
+  creator: "Khadlan Team",
+  publisher: "Khadlan",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "mn_MN",
+    url: "https://khadlan.mn",
+    siteName: "Khadlan.mn",
+    title: "Khadlan.mn",
+    description:
+      "Улсын хадлан системийн үйл ажиллагааг дэмжих хэлэлцүүлэг ба хүсэлтүүдийн платформ",
+    images: [
+      {
+        url: "https://khadlan.mn/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Khadlan.mn",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Khadlan.mn",
+    description:
+      "Улсын хадлан системийн үйл ажиллагааг дэмжих хэлэлцүүлэг ба хүсэлтүүдийн платформ",
+    creator: "@khadlan",
+  },
+  verification: {
+    google: "your-google-verification-code", // Replace with actual Google Search Console verification code
+  },
+  metadataBase: new URL("https://khadlan.mn"),
 };
