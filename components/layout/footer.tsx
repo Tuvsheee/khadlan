@@ -53,7 +53,7 @@ export default function Footer() {
             <p>
               © {currentYear} Khadlan.mn - Бүх эрх хуулиар хамгаалагдсан.{" "}
               <span className="text-primary font-medium hover:text-primary/90 cursor-pointer transition-colors">
-                Гео инженер сүрвэй ХХК
+                TANUSOFT ХХК
               </span>
             </p>
           </div>
