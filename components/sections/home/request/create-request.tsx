@@ -68,10 +68,10 @@ function CreateRequestModal() {
   });
 
   const handleTriggerClick = () => {
-    if (!accountStatus?.isActive) {
-      openPaymentModal();
-      return;
-    }
+    // if (!accountStatus?.isActive) {
+    //   openPaymentModal();
+    //   return;
+    // }
     setOpen(true);
   };
 

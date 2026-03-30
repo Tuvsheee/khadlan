@@ -1,9 +1,9 @@
-import { useSession } from "next-auth/react";
+import { useAuthStore } from "@/hooks/use-auth-store";
 
 export function useAuth() {
-  const { data: session } = useSession();
-  return {
-    user: session?.user,
-    token: session?.user?.token,
-  };
+  const user = useAuthStore((state) => state.user);
+  const token = useAuthStore((state) => state.token);
+  const logout = useAuthStore((state) => state.logout);
+
+  return { user, token, logout };
 }

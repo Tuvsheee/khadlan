@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
+import { useAuthStore } from "@/hooks/use-auth-store";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Хэрэглэгчийн нэр оруулна уу"),
@@ -32,18 +32,14 @@ export default function UserAuthForm() {
     },
   });
   const router = useRouter();
+  const login = useAuthStore((state) => state.login);
 
   const onSubmit = async (data: LoginFormData) => {
-    const result = await signIn("credentials", {
-      redirect: false,
-      username: data.username,
-      password: data.password,
-      callbackUrl: "/",
-    });
-    if (result?.error) {
-      toast.error(result.error);
-    } else {
+    try {
+      await login(data.username, data.password);
       router.push("/");
+    } catch (error: any) {
+      toast.error(error?.message || "Authentication failed");
     }
   };
   const loading = form.formState.isSubmitting;
