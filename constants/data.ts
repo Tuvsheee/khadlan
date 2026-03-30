@@ -13,11 +13,11 @@ const MENU_ITEMS: IMenu[] = [
       },
       {
         text: "Хэрэглэгч",
-        url: "/users?type=user",
+        url: "/users?role=user",
       },
       {
         text: "Иргэн",
-        url: "/users?type=citizen",
+        url: "/users?role=citizen",
       },
     ],
   },
