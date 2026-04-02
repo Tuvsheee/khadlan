@@ -331,8 +331,8 @@ function CreateRequestModal() {
             </DialogHeader>
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Доорх файл дээр дарж гэрээний нөхцлийг шалгаад "Би дээрх
-                гэрээний файлыг хараад гэрээний нөхцлийг зөвшөөрч байна"-г
+                Доорх файл дээр дарж гэрээний нөхцлийг шалгаад &quot;Би дээрх
+                гэрээний файлыг хараад гэрээний нөхцлийг зөвшөөрч байна&quot;-г
                 тэмдэглээд үргэлжлүүлэх товчийг дарна уу.
               </p>
               <div className="space-y-2 rounded-md border border-border bg-background p-4">
