@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useQueryUtil } from "@/hooks/use-query";
 import { useAuth } from "@/hooks/use-auth";
+import { getMedia } from "@/lib/utils";
 
 export default function ContractPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -237,14 +238,19 @@ export default function ContractPage() {
                   >
                     <div className="flex items-center gap-3">
                       <File className="h-4 w-4 text-primary" />
-                      <a
-                        href={file}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="truncate text-sm font-medium text-primary underline-offset-2 hover:underline"
-                      >
-                        {file.split("/").pop() || file}
-                      </a>
+                      {(() => {
+                        const fileUrl = getMedia(file) || file;
+                        return (
+                          <a
+                            href={fileUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="truncate text-sm font-medium text-primary underline-offset-2 hover:underline"
+                          >
+                            {file.split("/").pop() || file}
+                          </a>
+                        );
+                      })()}
                     </div>
                     <Button
                       variant="ghost"

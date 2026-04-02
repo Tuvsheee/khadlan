@@ -33,6 +33,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import SelectDistricts from "@/components/common/select-districts";
 import { useQueryUtil } from "@/hooks/use-query";
 import { usePayment } from "@/hooks/use-payment";
+import { getMedia } from "@/lib/utils";
 
 const createRequestSchema = z.object({
   userType: z.enum(["хувь хүн", "бизнес"], {
@@ -436,31 +437,38 @@ function CreateRequestModal() {
                     className="rounded-md border border-muted/50 bg-white px-3 py-2"
                   >
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <a
-                        href={entry.file}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-sm font-medium text-primary hover:underline"
-                      >
-                        {entry.file.split("/").pop()}
-                      </a>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <a
-                          href={entry.file}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center rounded-md border border-border bg-muted px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10"
-                        >
-                          Үзэх
-                        </a>
-                        <a
-                          href={entry.file}
-                          download
-                          className="inline-flex items-center rounded-md border border-border bg-background px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10"
-                        >
-                          Татах
-                        </a>
-                      </div>
+                      {(() => {
+                        const fileUrl = getMedia(entry.file) || entry.file;
+                        return (
+                          <>
+                            <a
+                              href={fileUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-sm font-medium text-primary hover:underline"
+                            >
+                              {entry.file.split("/").pop()}
+                            </a>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <a
+                                href={fileUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center rounded-md border border-border bg-muted px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10"
+                              >
+                                Үзэх
+                              </a>
+                              <a
+                                href={fileUrl}
+                                download
+                                className="inline-flex items-center rounded-md border border-border bg-background px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10"
+                              >
+                                Татах
+                              </a>
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 ))}

@@ -18,7 +18,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { cn, getMedia } from "@/lib/utils";
 import Link from "next/link";
 import { RoleGate } from "@/components/common/auth/role-gate";
 import UpdateRequestStatus from "./update-request-status";
@@ -81,16 +81,16 @@ export default function RequestDetailModal({
                     detail.status === "pending" &&
                       "bg-orange-500 text-white border-0",
                     detail.status === "cancelled" &&
-                      "bg-red-500 text-white border-0"
+                      "bg-red-500 text-white border-0",
                   )}
                 >
                   {detail.status === "confirmed"
                     ? "Баталгаажсан"
                     : detail.status === "paid"
-                    ? "Төлбөр төлөгдсөн"
-                    : detail.status === "pending"
-                    ? "Хүлээгдэж буй"
-                    : "Цуцлагдсан"}
+                      ? "Төлбөр төлөгдсөн"
+                      : detail.status === "pending"
+                        ? "Хүлээгдэж буй"
+                        : "Цуцлагдсан"}
                 </Badge>
               )}
             </div>
@@ -266,15 +266,23 @@ export default function RequestDetailModal({
                                         asChild
                                         className="h-8 px-2 mt-1"
                                       >
-                                        <Link
-                                          href={file}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="flex items-center gap-1"
-                                        >
-                                          <Download className="h-3 w-3" />
-                                          <span className="text-xs">Татах</span>
-                                        </Link>
+                                        {(() => {
+                                          const fileUrl =
+                                            getMedia(file) || file;
+                                          return (
+                                            <Link
+                                              href={fileUrl}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="flex items-center gap-1"
+                                            >
+                                              <Download className="h-3 w-3" />
+                                              <span className="text-xs">
+                                                Татах
+                                              </span>
+                                            </Link>
+                                          );
+                                        })()}
                                       </Button>
                                     </div>
                                   </div>
@@ -306,15 +314,23 @@ export default function RequestDetailModal({
                                         asChild
                                         className="h-8 px-2 mt-1"
                                       >
-                                        <Link
-                                          href={file}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="flex items-center gap-1"
-                                        >
-                                          <Download className="h-3 w-3" />
-                                          <span className="text-xs">Татах</span>
-                                        </Link>
+                                        {(() => {
+                                          const fileUrl =
+                                            getMedia(file) || file;
+                                          return (
+                                            <Link
+                                              href={fileUrl}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="flex items-center gap-1"
+                                            >
+                                              <Download className="h-3 w-3" />
+                                              <span className="text-xs">
+                                                Татах
+                                              </span>
+                                            </Link>
+                                          );
+                                        })()}
                                       </Button>
                                     </div>
                                   </div>

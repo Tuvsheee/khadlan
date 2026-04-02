@@ -17,7 +17,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { RoleGate } from "@/components/common/auth/role-gate";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { cn, getMedia } from "@/lib/utils";
 
 const UpdateRequestStatus = ({
   detail,
@@ -171,15 +171,20 @@ const UpdateRequestStatus = ({
                           asChild
                           className="h-8 px-2 mt-1"
                         >
-                          <Link
-                            href={file}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1"
-                          >
-                            <Download className="h-3 w-3" />
-                            <span className="text-xs">Татах</span>
-                          </Link>
+                          {(() => {
+                            const fileUrl = getMedia(file) || file;
+                            return (
+                              <Link
+                                href={fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1"
+                              >
+                                <Download className="h-3 w-3" />
+                                <span className="text-xs">Татах</span>
+                              </Link>
+                            );
+                          })()}
                         </Button>
                       </div>
                     </div>
