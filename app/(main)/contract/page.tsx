@@ -22,8 +22,9 @@ export default function ContractPage() {
     message: string;
     data: Array<{ _id: string; contractFiles: string[] }>;
   }>({
-    queryKey: ["contract-uploads"],
+    queryKey: ["contract-uploads", bagKhorooId],
     endpoint: "/request/uploadedContracts",
+    params: { bagKhorooId, senderOnly: "true" },
     enabled: Boolean(bagKhorooId),
   });
 

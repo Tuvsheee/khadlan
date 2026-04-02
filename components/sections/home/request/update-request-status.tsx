@@ -188,6 +188,25 @@ const UpdateRequestStatus = ({
               </div>
             )}
 
+            {detail.contractSignature ? (
+              <div className="rounded-lg border p-4 space-y-3">
+                <h4 className="text-sm font-medium flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-primary" />
+                  Гэрээний гарын үсэг
+                </h4>
+                <div className="rounded-md border bg-white p-3">
+                  <Image
+                    src={detail.contractSignature}
+                    alt="Гэрээний гарын үсэг"
+                    width={520}
+                    height={180}
+                    unoptimized
+                    className="h-auto w-full max-w-[520px] rounded-sm object-contain"
+                  />
+                </div>
+              </div>
+            ) : null}
+
             {detail.status !== "paid" && (
               <>
                 {/* Status Selection */}

@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select";
 import { useMutationUtil } from "@/hooks/use-mutation";
 import { toast } from "sonner";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import SelectDistricts from "@/components/common/select-districts";
 import { useQueryUtil } from "@/hooks/use-query";
 import { usePayment } from "@/hooks/use-payment";
@@ -72,8 +72,11 @@ function CreateRequestModal() {
     name: "bagKhorooId",
   });
 
-  const [acceptedContractTerms, setAcceptedContractTerms] = useState(false);
+  const [hasSignature, setHasSignature] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [signatureDataUrl, setSignatureDataUrl] = useState("");
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
 
   const { data: contractUploads } = useQueryUtil<{
     success: boolean;
@@ -99,9 +102,101 @@ function CreateRequestModal() {
     [contractUploads],
   );
 
+  const getCanvasPoint = (
+    event:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+
+    const rect = canvas.getBoundingClientRect();
+
+    if ("touches" in event) {
+      const touch = event.touches[0] ?? event.changedTouches[0];
+      return {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top,
+      };
+    }
+
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+  };
+
+  const startDraw = (
+    event:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    const { x, y } = getCanvasPoint(event);
+    context.beginPath();
+    context.moveTo(x, y);
+    setIsDrawing(true);
+    setHasSignature(true);
+  };
+
+  const draw = (
+    event:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ) => {
+    if (!isDrawing) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    const { x, y } = getCanvasPoint(event);
+    context.lineTo(x, y);
+    context.strokeStyle = "#1f2937";
+    context.lineWidth = 2;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.stroke();
+  };
+
+  const stopDraw = () => {
+    const canvas = canvasRef.current;
+    if (canvas && hasSignature) {
+      setSignatureDataUrl(canvas.toDataURL("image/png"));
+    }
+    setIsDrawing(false);
+  };
+
+  const clearSignature = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    setHasSignature(false);
+    setSignatureDataUrl("");
+    setIsDrawing(false);
+  };
+
   useEffect(() => {
-    setAcceptedContractTerms(false);
+    setHasSignature(false);
+    setSignatureDataUrl("");
   }, [bagKhorooIdValue, uploadedContractFiles.length]);
+
+  useEffect(() => {
+    if (isReviewOpen) {
+      clearSignature();
+    }
+  }, [isReviewOpen]);
 
   const handleTriggerClick = () => {
     // if (!accountStatus?.isActive) {
@@ -123,7 +218,8 @@ function CreateRequestModal() {
 
   const onSubmit = (data: CreateRequestData) => {
     if (uploadedContractFiles.length > 0) {
-      setAcceptedContractTerms(false);
+      setHasSignature(false);
+      setSignatureDataUrl("");
       setIsReviewOpen(true);
       return;
     }
@@ -132,13 +228,17 @@ function CreateRequestModal() {
   };
 
   const handleReviewConfirm = () => {
-    if (!acceptedContractTerms) {
-      toast.error("Гэрээний файлыг шалгаж, нөхцлийг зөвшөөрнө үү");
+    if (!hasSignature || !signatureDataUrl) {
+      toast.error("Гарын үсгээ зурж баталгаажуулна уу");
       return;
     }
 
     const data = form.getValues();
-    mutate({ ...data, landSize: Number(data.landSize) });
+    mutate({
+      ...data,
+      landSize: Number(data.landSize),
+      contractSignature: signatureDataUrl,
+    });
     setIsReviewOpen(false);
   };
 
@@ -311,12 +411,6 @@ function CreateRequestModal() {
               >
                 {isPending ? "Илгээж байна..." : "Хүсэлт илгээх"}
               </Button>
-              {uploadedContractFiles.length > 0 && !acceptedContractTerms ? (
-                <p className="text-sm text-destructive">
-                  Гэрээний файлыг бүрэн шалгаж, нөхцлийг зөвшөөрсний дараа
-                  хүсэлт илгээх боломжтой.
-                </p>
-              ) : null}
             </form>
           </Form>
         </div>
@@ -372,23 +466,43 @@ function CreateRequestModal() {
                 ))}
               </div>
               <div className="flex items-start gap-3 rounded-md border border-border bg-background p-3">
-                <input
-                  id="review-accept-contract-terms"
-                  type="checkbox"
-                  checked={acceptedContractTerms}
-                  onChange={(event) =>
-                    setAcceptedContractTerms(event.target.checked)
-                  }
-                  className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                />
-                <label
-                  htmlFor="review-accept-contract-terms"
-                  className="text-sm leading-6"
-                >
-                  Би дээрх гэрээний файлыг хараад гэрээний нөхцлийг зөвшөөрч
-                  байна.
-                </label>
+                <div className="w-full space-y-2">
+                  <p className="text-sm font-medium">
+                    Энд гарын үсгээ зурна уу
+                  </p>
+                  <canvas
+                    ref={canvasRef}
+                    width={520}
+                    height={170}
+                    onMouseDown={startDraw}
+                    onMouseMove={draw}
+                    onMouseUp={stopDraw}
+                    onMouseLeave={stopDraw}
+                    onTouchStart={startDraw}
+                    onTouchMove={draw}
+                    onTouchEnd={stopDraw}
+                    className="w-full rounded-md border border-dashed border-border bg-white touch-none"
+                  />
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      Гарын үсэг зурсны дараа үргэлжлүүлэх боломжтой.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={clearSignature}
+                    >
+                      Дахин зурах
+                    </Button>
+                  </div>
+                </div>
               </div>
+              {!hasSignature ? (
+                <p className="text-sm text-destructive">
+                  Баталгаажуулахын тулд гарын үсгээ зурна уу.
+                </p>
+              ) : null}
             </div>
             <div className="mt-6 flex justify-end gap-3">
               <Button
@@ -399,7 +513,7 @@ function CreateRequestModal() {
               </Button>
               <Button
                 onClick={handleReviewConfirm}
-                disabled={!acceptedContractTerms || isPending}
+                disabled={!hasSignature || isPending}
               >
                 {isPending ? "Илгээж байна..." : "Үргэлжлүүлэх"}
               </Button>

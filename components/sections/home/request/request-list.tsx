@@ -121,6 +121,9 @@ export default function RequestList() {
                   Газрын хэмжээ
                 </div>
               </TableHead>
+              <TableHead className="font-semibold">Аймаг/Хот</TableHead>
+              <TableHead className="font-semibold">Сум/Дүүрэг</TableHead>
+              <TableHead className="font-semibold">Баг/Хороо</TableHead>
               <TableHead className="font-semibold">Төлөв</TableHead>
               <TableHead className="text-right font-semibold">
                 <div className="flex items-center justify-end gap-2">
@@ -133,7 +136,7 @@ export default function RequestList() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-24">
+                <TableCell colSpan={8} className="h-24">
                   <div className="flex items-center justify-center gap-2">
                     <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                     <span>Уншиж байна...</span>
@@ -142,7 +145,7 @@ export default function RequestList() {
               </TableRow>
             ) : data?.data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-32">
+                <TableCell colSpan={8} className="h-32">
                   <div className="flex flex-col items-center justify-center text-center">
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                       <FileText className="h-6 w-6 text-primary" />
@@ -189,6 +192,21 @@ export default function RequestList() {
                     <div className="font-medium">{request?.landSize} га</div>
                   </TableCell>
                   <TableCell>
+                    <div className="font-medium">
+                      {request.district || "Мэдээлэлгүй"}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium">
+                      {request.subDistrict || "Мэдээлэлгүй"}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium">
+                      {request.bagKhoroo || "Мэдээлэлгүй"}
+                    </div>
+                  </TableCell>
+                  <TableCell>
                     <p
                       className={cn(
                         "inline-block px-2 py-1 rounded-2xl text-sm font-medium",
@@ -200,11 +218,8 @@ export default function RequestList() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="text-sm text-muted-foreground">
-                      {request.sender?.createdAt &&
-                        format(
-                          new Date(request?.sender?.createdAt),
-                          "yyyy.MM.dd",
-                        )}
+                      {request.createdAt &&
+                        format(new Date(request.createdAt), "yyyy.MM.dd")}
                     </div>
                   </TableCell>
                 </TableRow>
