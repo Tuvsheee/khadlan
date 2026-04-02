@@ -50,6 +50,11 @@ const MENU_ITEMS: IMenu[] = [
     ],
   },
   {
+    text: "Гэрээ",
+    url: "/contract",
+    roles: ["user"],
+  },
+  {
     text: "Аудит",
     url: "/logs",
     roles: ["admin"],

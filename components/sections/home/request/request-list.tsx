@@ -192,7 +192,7 @@ export default function RequestList() {
                     <p
                       className={cn(
                         "inline-block px-2 py-1 rounded-2xl text-sm font-medium",
-                        STATUS_MAP[request.status].color
+                        STATUS_MAP[request.status].color,
                       )}
                     >
                       {STATUS_MAP[request.status].label}
@@ -203,7 +203,7 @@ export default function RequestList() {
                       {request.sender?.createdAt &&
                         format(
                           new Date(request?.sender?.createdAt),
-                          "yyyy.MM.dd"
+                          "yyyy.MM.dd",
                         )}
                     </div>
                   </TableCell>

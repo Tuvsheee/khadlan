@@ -69,8 +69,8 @@ export default function UserDetail({
                     profile.role === "admin"
                       ? "default"
                       : profile.role === "citizen"
-                      ? "secondary"
-                      : "outline"
+                        ? "secondary"
+                        : "outline"
                   }
                 >
                   <Shield className="w-3 h-3 mr-1" />
@@ -82,7 +82,7 @@ export default function UserDetail({
                   className={cn(
                     profile.status
                       ? "bg-green-50 text-green-700 border-green-200"
-                      : "bg-red-50 text-red-700 border-red-200"
+                      : "bg-red-50 text-red-700 border-red-200",
                   )}
                 >
                   {profile.status ? "Идэвхтэй" : "Идэвхгүй"}
@@ -164,7 +164,7 @@ export default function UserDetail({
                             <Badge
                               className={cn(
                                 "px-2 py-0.5",
-                                STATUS_MAP[request.status].color
+                                STATUS_MAP[request.status].color,
                               )}
                             >
                               {STATUS_MAP[request.status].label}

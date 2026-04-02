@@ -129,10 +129,10 @@ const UpdateRequestStatus = ({
                   detail.status === "confirmed"
                     ? "default"
                     : detail.status === "paid"
-                    ? "secondary"
-                    : detail.status === "pending"
-                    ? "outline"
-                    : "destructive"
+                      ? "secondary"
+                      : detail.status === "pending"
+                        ? "outline"
+                        : "destructive"
                 }
                 className={cn("px-3", STATUS_MAP[detail.status].color)}
               >
@@ -162,8 +162,8 @@ const UpdateRequestStatus = ({
                           {detail.status === "pending"
                             ? `Хадлан талбай ${index + 1}`
                             : detail.status === "paid"
-                            ? `Төлбөр төлсөн баримт ${index + 1}`
-                            : `Хүсэлтийн файл ${index + 1}`}
+                              ? `Төлбөр төлсөн баримт ${index + 1}`
+                              : `Хүсэлтийн файл ${index + 1}`}
                         </p>
                         <Button
                           variant="ghost"
@@ -234,7 +234,7 @@ const UpdateRequestStatus = ({
                 </div>
 
                 {/* File Upload Section */}
-                <div className="space-y-3">
+                {/* <div className="space-y-3">
                   <h4 className="text-sm font-medium flex items-center gap-2">
                     <FileText className="h-4 w-4 text-primary" />
                     {selectedStatus === "paid"
@@ -332,7 +332,7 @@ const UpdateRequestStatus = ({
                         : "Файл сонгох (олон файл боломжтой)"}
                     </p>
                   </div>
-                </div>
+                </div> */}
 
                 <Button
                   onClick={handleSubmit}
