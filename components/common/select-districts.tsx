@@ -1,5 +1,4 @@
 "use client";
-import { useQueryUtil } from "@/hooks/use-query";
 import { useState, useEffect } from "react";
 import {
   Select,
@@ -9,16 +8,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { AIMAGS, SUMS, BAG_KHOROOS } from "@/constants/data";
 
 interface District {
   _id: string;
   name: string;
-}
-
-interface DistrictResponse {
-  success: boolean;
-  message: string;
-  data: District[];
 }
 
 interface SelectDistrictsProps {
@@ -68,27 +62,23 @@ const SelectDistricts = ({
     onBagKhorooChange,
   ]);
 
-  // Fetch provinces
-  const { data: provinces, isLoading: isLoadingProvinces } =
-    useQueryUtil<DistrictResponse>({
-      queryKey: ["districts"],
-      endpoint: "/district",
-    });
+  // Use local data from constants instead of API fetch
+  const provinces = [...AIMAGS].sort((a, b) => {
+    if (a.name === "Улаанбаатар") return -1;
+    if (b.name === "Улаанбаатар") return 1;
+    return a.name.localeCompare(b.name, "mn", { sensitivity: "base" });
+  });
 
-  // Fetch districts based on selected province
-  const { data: districts, isLoading: isLoadingDistricts } =
-    useQueryUtil<DistrictResponse>({
-      queryKey: ["districts", selectedProvince],
-      endpoint: `/district/${selectedProvince}`,
-      enabled: !!selectedProvince,
-    });
+  const districts = selectedProvince
+    ? SUMS.filter((district) => district.parentId === selectedProvince)
+    : [];
+  const bagKhoroos = selectedDistrict
+    ? BAG_KHOROOS.filter((bag) => bag.parentId === selectedDistrict)
+    : [];
 
-  const { data: bagKhoroos, isLoading: isLoadingBagKhoroos } =
-    useQueryUtil<DistrictResponse>({
-      queryKey: ["bagKhoroo", selectedDistrict],
-      endpoint: `/district/bagKhoroo/${selectedDistrict}`,
-      enabled: !!selectedDistrict,
-    });
+  const isLoadingProvinces = false;
+  const isLoadingDistricts = false;
+  const isLoadingBagKhoroos = false;
 
   const handleProvinceChange = (value: string) => {
     setSelectedProvince(value);
@@ -120,8 +110,8 @@ const SelectDistricts = ({
           <SelectTrigger>
             <SelectValue placeholder="Аймаг сонгох" />
           </SelectTrigger>
-          <SelectContent>
-            {provinces?.data.map((province) => (
+          <SelectContent className="max-h-60 overflow-auto">
+            {provinces.map((province) => (
               <SelectItem key={province._id} value={province._id}>
                 {province.name}
               </SelectItem>
@@ -140,8 +130,8 @@ const SelectDistricts = ({
           <SelectTrigger>
             <SelectValue placeholder="Сум сонгох" />
           </SelectTrigger>
-          <SelectContent>
-            {districts?.data?.map((district) => (
+          <SelectContent className="max-h-60 overflow-auto">
+            {districts.map((district) => (
               <SelectItem key={district._id} value={district._id}>
                 {district.name}
               </SelectItem>
@@ -160,8 +150,8 @@ const SelectDistricts = ({
           <SelectTrigger>
             <SelectValue placeholder="Баг/Хороо сонгох" />
           </SelectTrigger>
-          <SelectContent>
-            {bagKhoroos?.data?.map((bagKhoroo) => (
+          <SelectContent className="max-h-60 overflow-auto">
+            {bagKhoroos.map((bagKhoroo) => (
               <SelectItem key={bagKhoroo._id} value={bagKhoroo._id}>
                 {bagKhoroo.name}
               </SelectItem>

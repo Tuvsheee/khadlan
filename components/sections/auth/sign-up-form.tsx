@@ -46,7 +46,7 @@ export default function SignUpForm() {
 
   const { mutate: signUp, isPending: isSigningUp } = useMutationUtil<
     SignUpResponse,
-    Omit<SignUpType, "confirmPassword">
+    { user: Omit<SignUpType, "confirmPassword"> }
   >({
     endpoint: "/auth/signup",
     queryKey: ["signup"],
@@ -58,7 +58,7 @@ export default function SignUpForm() {
 
   const onSubmit = (data: SignUpType) => {
     const { confirmPassword, ...signUpData } = data;
-    signUp(signUpData);
+    signUp({ user: signUpData });
   };
 
   const handleProvinceChange = (value: string) => {
