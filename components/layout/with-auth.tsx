@@ -34,7 +34,7 @@ const WithAuth = ({ children }: { children: React.ReactNode }) => {
     if (!user) {
       axios.defaults.headers.common["Authorization"] = "";
 
-      if (PUBLIC_ROUTES.includes(pathname)) {
+      if (pathname && PUBLIC_ROUTES.includes(pathname)) {
         setLoading(false);
         return;
       }
