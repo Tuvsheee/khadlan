@@ -45,7 +45,7 @@ const WithAuth = ({ children }: { children: React.ReactNode }) => {
 
     axios.defaults.headers.common["Authorization"] = `Bearer ${user.token}`;
 
-    if (PUBLIC_ROUTES.includes(pathname)) {
+    if (pathname && PUBLIC_ROUTES.includes(pathname)) {
       if (pathname === login || pathname === signup) {
         routerNav.replace("/dashboard");
         return;
@@ -56,9 +56,11 @@ const WithAuth = ({ children }: { children: React.ReactNode }) => {
     }
 
     const userRole = user.role as Role;
-    const isAllowedRoute = ALLOWED_ROUTES.some(
-      (route) => pathname === route || pathname.startsWith(route + "/"),
-    );
+    const isAllowedRoute =
+      pathname &&
+      ALLOWED_ROUTES.some(
+        (route) => pathname === route || pathname.startsWith(route + "/"),
+      );
 
     if (isAllowedRoute) {
       setLoading(false);
@@ -69,11 +71,13 @@ const WithAuth = ({ children }: { children: React.ReactNode }) => {
       item.roles.includes(userRole),
     );
 
-    const hasAccess = allowedMenuItems.some((item) => {
-      if (pathname === item.url) return true;
-      if (pathname.startsWith(item.url + "/")) return true;
-      return false;
-    });
+    const hasAccess =
+      pathname &&
+      allowedMenuItems.some((item) => {
+        if (pathname === item.url) return true;
+        if (pathname.startsWith(item.url + "/")) return true;
+        return false;
+      });
 
     if (!hasAccess && pathname !== "/") {
       routerNav.push("/");
