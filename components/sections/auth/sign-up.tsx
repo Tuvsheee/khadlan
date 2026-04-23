@@ -3,24 +3,27 @@ import Link from "next/link";
 
 export default function SignupPageView() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-gray-950 rounded-2xl shadow-xl p-8 space-y-8">
-          <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Бүртгүүлэх
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Шинээр бүртгүүлэхийн тулд и-мэйл хаяг болон нууц үгээ оруулна уу
-            </p>
-          </div>
-          <SignUpForm />
-          <div className="text-center text-sm">
-            Бүртгэлтэй юу?{" "}
-            <Link href="/auth/login" className="text-primary hover:underline">
-              Нэвтрэх
-            </Link>
-          </div>
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#f4f4f5] p-4 md:p-8">
+      <div className="w-full max-w-3xl rounded-2xl border border-gray-100 bg-white shadow-xl p-7 md:p-10 space-y-7">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-medium text-[#0f5e34]">
+            Шинэ бүртгэл үүсгэх
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Төрийн газрын удирдлагын нэгдсэн системд нэгдэж бүртгүүлнэ.
+          </p>
+        </div>
+
+        <SignUpForm />
+
+        <div className="text-center text-sm text-muted-foreground">
+          Бүртгэлтэй юу?{" "}
+          <Link
+            href="/auth/login"
+            className="text-[#0f5e34] hover:underline font-medium"
+          >
+            Нэвтрэх
+          </Link>
         </div>
       </div>
     </div>

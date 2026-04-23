@@ -245,18 +245,22 @@ function CreateRequestModal() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Button size="lg" className="gap-2" onClick={handleTriggerClick}>
+      <Button
+        size="lg"
+        className="gap-2 rounded-xl bg-[#0f5e34] hover:bg-[#0c4b2a] shadow-sm"
+        onClick={handleTriggerClick}
+      >
         <Plus className="h-4 w-4" />
         Хадлан ашиглах хүсэлт илгээх
       </Button>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto p-0">
-        <div className="p-6">
+      <DialogContent className="sm:max-w-[860px] max-h-[90vh] overflow-y-auto p-0 rounded-2xl border border-slate-200">
+        <div className="p-6 md:p-7 bg-gradient-to-b from-white to-slate-50/40">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
-              <MapPin className="h-5 w-5 text-primary" />
+              <MapPin className="h-5 w-5 text-[#0f5e34]" />
               Хадлан ашиглах хүсэлт илгээх
             </DialogTitle>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground text-sm leading-relaxed">
               Та доорх мэдээллийг бөглөн хадлан ашиглах хүсэлтээ илгээнэ үү
             </p>
           </DialogHeader>
@@ -266,9 +270,12 @@ function CreateRequestModal() {
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-6 mt-6"
             >
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="">
+              <div className="space-y-5">
+                <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 md:p-5 shadow-sm">
+                  <h3 className="text-sm font-semibold text-slate-700">
+                    Байршлын мэдээлэл
+                  </h3>
+                  <div>
                     <FormField
                       control={form.control}
                       name="subDistrictId"
@@ -296,9 +303,15 @@ function CreateRequestModal() {
                       name="street"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Гудамж/Хороо</FormLabel>
+                          <FormLabel className="text-sm font-medium text-slate-700">
+                            Гудамж/Хороо
+                          </FormLabel>
                           <FormControl>
-                            <Input placeholder="Гудамж/Хороо..." {...field} />
+                            <Input
+                              placeholder="Гудамж/Хороо..."
+                              {...field}
+                              className="h-11 bg-slate-50 border-slate-200"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -309,13 +322,15 @@ function CreateRequestModal() {
                       name="userType"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Хэрэглэгчийн төрөл</FormLabel>
+                          <FormLabel className="text-sm font-medium text-slate-700">
+                            Хэрэглэгчийн төрөл
+                          </FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className="h-11 bg-slate-50 border-slate-200">
                                 <SelectValue placeholder="Хэрэглэгчийн төрөл сонгох" />
                               </SelectTrigger>
                             </FormControl>
@@ -364,20 +379,25 @@ function CreateRequestModal() {
                   </div>
                 ) : null} */}
 
-                <div className="space-y-2">
-                  <h3 className="font-medium">Газрын мэдээлэл</h3>
+                <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 md:p-5 shadow-sm">
+                  <h3 className="text-sm font-semibold text-slate-700">
+                    Газрын мэдээлэл
+                  </h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     <FormField
                       control={form.control}
                       name="landSize"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Газрын хэмжээ (га)</FormLabel>
+                          <FormLabel className="text-sm font-medium text-slate-700">
+                            Газрын хэмжээ (га)
+                          </FormLabel>
                           <FormControl>
                             <Input
                               type="number"
                               placeholder="Жишээ: 1.5"
                               {...field}
+                              className="h-11 bg-slate-50 border-slate-200"
                             />
                           </FormControl>
                           <FormMessage />
@@ -389,11 +409,14 @@ function CreateRequestModal() {
                       name="landName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Газрын нэр</FormLabel>
+                          <FormLabel className="text-sm font-medium text-slate-700">
+                            Газрын нэр
+                          </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Жишээ: Хадлангийн талбай"
                               {...field}
+                              className="h-11 bg-slate-50 border-slate-200"
                             />
                           </FormControl>
                           <FormMessage />
@@ -406,7 +429,7 @@ function CreateRequestModal() {
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full h-11 bg-[#0f5e34] hover:bg-[#0c4b2a]"
                 size="lg"
                 disabled={isPending}
               >
@@ -417,24 +440,24 @@ function CreateRequestModal() {
         </div>
       </DialogContent>
       <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <div className="p-6">
+        <DialogContent className="sm:max-w-[640px] rounded-2xl border border-slate-200 p-0">
+          <div className="p-6 md:p-7 bg-gradient-to-b from-white to-slate-50/40">
             <DialogHeader>
               <DialogTitle className="text-xl">
                 Гэрээний файлыг баталгаажуулах
               </DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-4 mt-4">
               <p className="text-sm text-muted-foreground">
                 Доорх файл дээр дарж гэрээний нөхцлийг шалгаад &quot;Би дээрх
                 гэрээний файлыг хараад гэрээний нөхцлийг зөвшөөрч байна&quot;-г
                 тэмдэглээд үргэлжлүүлэх товчийг дарна уу.
               </p>
-              <div className="space-y-2 rounded-md border border-border bg-background p-4">
+              <div className="space-y-2 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
                 {uploadedContractFiles.map((entry) => (
                   <div
                     key={`${entry.uploadId}-${entry.file}`}
-                    className="rounded-md border border-muted/50 bg-white px-3 py-2"
+                    className="rounded-md border border-slate-200 bg-slate-50/60 px-3 py-2"
                   >
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       {(() => {
@@ -454,14 +477,14 @@ function CreateRequestModal() {
                                 href={fileUrl}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="inline-flex items-center rounded-md border border-border bg-muted px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10"
+                                className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10"
                               >
                                 Үзэх
                               </a>
                               <a
                                 href={fileUrl}
                                 download
-                                className="inline-flex items-center rounded-md border border-border bg-background px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10"
+                                className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10"
                               >
                                 Татах
                               </a>
@@ -473,7 +496,7 @@ function CreateRequestModal() {
                   </div>
                 ))}
               </div>
-              <div className="flex items-start gap-3 rounded-md border border-border bg-background p-3">
+              <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
                 <div className="w-full space-y-2">
                   <p className="text-sm font-medium">
                     Энд гарын үсгээ зурна уу

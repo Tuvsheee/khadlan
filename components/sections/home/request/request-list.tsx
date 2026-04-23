@@ -2,6 +2,7 @@
 
 import { useQueryUtil } from "@/hooks/use-query";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Pagination from "@/components/common/pagination";
 import RequestDetail from "./request-detail";
 import {
@@ -10,14 +11,7 @@ import {
   STATUS_MAP,
   Status,
 } from "@/types/request";
-import {
-  FileText,
-  User,
-  MapPin,
-  Calendar,
-  Search,
-  ListFilter,
-} from "lucide-react";
+import { FileText, User, Search } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -32,15 +26,38 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Filter from "@/components/common/filter";
+import Image from "next/image";
+import { useAuth } from "@/hooks/use-auth";
+import RequestStats from "./request-stats";
 
 export default function RequestList() {
+  const router = useRouter();
+  const { user } = useAuth();
+  const isCitizen = user?.role === "citizen";
+  const isUser = user?.role === "user";
+  const showRequestTabs = isCitizen || isUser;
   const params = useSearchParams();
-  const type = params.get("type");
+  const type = params?.get("type");
   const [selectedRequest, setSelectedRequest] = useState<string | null>(null);
   const [status, setStatus] = useState<Status | null>(type as Status);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"latest" | "oldest">("latest");
   const debouncedSearch = useDebounce(search, 500);
+
+  const handleStatusChange = (newStatus: Status | null) => {
+    setStatus(newStatus);
+    setCurrentPage(1);
+    
+    // Update URL params
+    const url = new URL(window.location.href);
+    if (newStatus) {
+      url.searchParams.set("type", newStatus);
+    } else {
+      url.searchParams.delete("type");
+    }
+    router.push(url.pathname + url.search);
+  };
 
   const { data, isLoading } = useQueryUtil<{
     data: RequestData[];
@@ -60,83 +77,132 @@ export default function RequestList() {
     setCurrentPage(1);
   };
 
-  const statusOptions = [
-    {
-      label: "Баталгаажсан",
-      value: "confirmed" as Status,
-      color: "text-green-500 font-medium",
-    },
-    {
-      label: "Төлбөр төлөгдсөн",
-      value: "paid" as Status,
-      color: "text-blue-500 font-medium",
-    },
-    {
-      label: "Хүлээгдэж буй",
-      value: "pending" as Status,
-      color: "text-orange-500 font-medium",
-    },
-    {
-      label: "Цуцлагдсан",
-      value: "cancelled" as Status,
-      color: "text-destructive font-medium",
-    },
+  const tabOptions: { label: string; value: Status | null }[] = [
+    { label: "Бүгд", value: null },
+    { label: "Баталгаажсан", value: "confirmed" },
+    { label: "Хүлээгдэж буй", value: "pending" },
+    { label: "Цуцлагдсан", value: "cancelled" },
   ];
 
+  const sortedRows = [...(data?.data || [])].sort((a, b) => {
+    const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return sortBy === "latest" ? bTime - aTime : aTime - bTime;
+  });
+
+  const statusBadgeClass: Record<Status, string> = {
+    confirmed: "bg-green-100 text-green-700 border border-green-200",
+    paid: "bg-blue-100 text-blue-700 border border-blue-200",
+    pending: "bg-amber-100 text-amber-700 border border-amber-200",
+    cancelled: "bg-red-100 text-red-700 border border-red-200",
+  };
+
   return (
-    <div className="relative space-y-6">
+    <div className="relative space-y-4 rounded-2xl border bg-white p-4 md:p-5 shadow-sm">
+      {isUser && <RequestStats status={status} variant="user" />}
+
+      {showRequestTabs && (
+        <div className="flex flex-wrap items-center gap-2">
+          {tabOptions.map((tab) => {
+            const isActive = status === tab.value;
+            return (
+              <button
+                key={tab.label}
+                type="button"
+                onClick={() => handleStatusChange(tab.value)}
+                className={cn(
+                  "h-9 px-4 rounded-full text-sm font-medium border transition-colors",
+                  isActive
+                    ? "bg-[#0b3d6d] border-[#0b3d6d] text-white"
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50",
+                )}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Search and Filter Section */}
-      <div className="flex flex-col sm:flex-row md:items-start sm:items-center gap-4">
-        <div className="relative flex-1 w-full md:max-w-md">
+      <div className="flex flex-col md:flex-row md:items-center gap-3">
+        <div className="relative flex-1 w-full md:max-w-lg">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Нэр, регистрийн дугаараар хайх..."
             value={search}
             onChange={handleSearch}
-            className="pl-9 w-full"
+            className="pl-9 w-full h-10 rounded-full bg-slate-50 border-slate-200"
           />
         </div>
-        <Filter<Status>
-          value={status}
-          onChange={setStatus}
-          options={statusOptions}
-        />
+
+        <div className="ml-auto flex items-center gap-2">
+          {!showRequestTabs && (
+            <Filter<Status>
+              value={status}
+              onChange={(value) => handleStatusChange(value as Status | null)}
+              options={[
+                { label: "Баталгаажсан", value: "confirmed" },
+                { label: "Хүлээгдэж буй", value: "pending" },
+                { label: "Цуцлагдсан", value: "cancelled" },
+                { label: "Төлбөр төлсөн", value: "paid" },
+              ]}
+              label="Төлөв"
+              triggerLabel={
+                tabOptions.find((tab) => tab.value === status)?.label || "Бүгд"
+              }
+            />
+          )}
+
+          <Filter<"latest" | "oldest">
+            value={sortBy}
+            onChange={(value) =>
+              setSortBy((value || "latest") as "latest" | "oldest")
+            }
+            options={[
+              { label: "Хамгийн сүүлийнх", value: "latest" },
+              { label: "Хамгийн эхнийх", value: "oldest" },
+            ]}
+            label="Эрэмбэлэх"
+            triggerLabel={
+              sortBy === "latest" ? "Хамгийн сүүлийнх" : "Хамгийн эхнийх"
+            }
+          />
+        </div>
       </div>
 
       {/* Table Section */}
-      <div className="rounded-lg text-nowrap border bg-card">
+      <div className="rounded-xl text-nowrap border border-slate-200 overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="hover:bg-muted/50">
-              <TableHead className="font-semibold">Овог, нэр</TableHead>
-              <TableHead className="font-semibold">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                  РД
-                </div>
+            <TableRow className="bg-slate-50/70 hover:bg-slate-50/70">
+              <TableHead className="font-semibold text-slate-700">
+                Овог нэр
               </TableHead>
-              <TableHead className="font-semibold">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  Газрын хэмжээ
-                </div>
+              <TableHead className="font-semibold text-slate-700">
+                Регистрийн дугаар
               </TableHead>
-              <TableHead className="font-semibold">Аймаг/Хот</TableHead>
-              <TableHead className="font-semibold">Сум/Дүүрэг</TableHead>
-              <TableHead className="font-semibold">Баг/Хороо</TableHead>
-              <TableHead className="font-semibold">Төлөв</TableHead>
-              <TableHead className="text-right font-semibold">
-                <div className="flex items-center justify-end gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  Үүсгэсэн огноо
-                </div>
+              <TableHead className="font-semibold text-slate-700">
+                Газрын хэмжээ
+              </TableHead>
+              <TableHead className="font-semibold text-slate-700">
+                Аймаг сум
+              </TableHead>
+              <TableHead className="font-semibold text-slate-700">
+                Баг
+              </TableHead>
+              <TableHead className="font-semibold text-slate-700">
+                Төлөв
+              </TableHead>
+              <TableHead className="text-right font-semibold text-slate-700">
+                Огноо
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={8} className="h-24">
+                <TableCell colSpan={7} className="h-24">
                   <div className="flex items-center justify-center gap-2">
                     <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                     <span>Уншиж байна...</span>
@@ -145,7 +211,7 @@ export default function RequestList() {
               </TableRow>
             ) : data?.data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="h-32">
+                <TableCell colSpan={7} className="h-32">
                   <div className="flex flex-col items-center justify-center text-center">
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                       <FileText className="h-6 w-6 text-primary" />
@@ -162,62 +228,75 @@ export default function RequestList() {
                 </TableCell>
               </TableRow>
             ) : (
-              data?.data.map((request) => (
+              sortedRows.map((request) => (
                 <TableRow
                   key={request._id}
-                  className="cursor-pointer hover:bg-muted/50"
+                  className="cursor-pointer hover:bg-slate-50/60"
                   onClick={() => setSelectedRequest(request._id)}
                 >
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <User className="h-4 w-4 text-primary" />
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center">
+                        {request.sender?.profileImageUrl ? (
+                          <Image
+                            src={request.sender.profileImageUrl}
+                            alt="User avatar"
+                            width={36}
+                            height={36}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <User className="h-4 w-4 text-primary" />
+                        )}
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-medium">
-                          {request.sender?.lastName || "Овог оруулаагүй"}
+                        <span className="font-medium text-slate-800">
+                          {(request.sender?.lastName || "-") +
+                            " " +
+                            (request.sender?.firstName || "-")}
                         </span>
-                        <span className="text-sm text-muted-foreground">
-                          {request.sender?.firstName || "Нэр оруулаагүй"}
+                        <span className="text-xs text-slate-400">
+                          Илгээгчийн мэдээлэл
                         </span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="font-medium">
+                    <div className="font-medium text-slate-700">
                       {request.sender?.regNumber || "Регистр оруулаагүй"}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="font-medium">{request?.landSize} га</div>
+                    <div className="font-medium text-emerald-700">
+                      {request?.landSize} га
+                    </div>
                   </TableCell>
                   <TableCell>
-                    <div className="font-medium">
+                    <div className="font-medium text-slate-700">
                       {request.district || "Мэдээлэлгүй"}
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        {request.subDistrict || ""}
+                      </p>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="font-medium">
-                      {request.subDistrict || "Мэдээлэлгүй"}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium">
+                    <div className="font-medium text-slate-700">
                       {request.bagKhoroo || "Мэдээлэлгүй"}
                     </div>
                   </TableCell>
                   <TableCell>
                     <p
                       className={cn(
-                        "inline-block px-2 py-1 rounded-2xl text-sm font-medium",
-                        STATUS_MAP[request.status].color,
+                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
+                        statusBadgeClass[request.status],
                       )}
                     >
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
                       {STATUS_MAP[request.status].label}
                     </p>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-slate-600">
                       {request.createdAt &&
                         format(new Date(request.createdAt), "yyyy.MM.dd")}
                     </div>

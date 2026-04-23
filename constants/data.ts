@@ -4,7 +4,7 @@ const MENU_ITEMS: IMenu[] = [
   {
     text: "Хэрэглэгчид",
     url: "/users",
-    roles: ["admin"],
+    roles: ["admin", "superadmin"],
     type: "dropdown",
     items: [
       {
@@ -23,29 +23,29 @@ const MENU_ITEMS: IMenu[] = [
   },
   {
     text: "Хүсэлтүүд",
-    url: "/",
-    roles: ["admin", "user", "citizen"],
+    url: "/requests",
+    roles: ["admin", "superadmin", "user", "citizen"],
     type: "dropdown",
     items: [
       {
         text: "Бүгд",
-        url: "/",
+        url: "/requests",
       },
       {
         text: "Төлсөн",
-        url: "/?type=paid",
+        url: "/requests?type=paid",
       },
       {
         text: "Баталгаажсан",
-        url: "/?type=confirmed",
+        url: "/requests?type=confirmed",
       },
       {
         text: "Хянагдаж байгаа",
-        url: "/?type=pending",
+        url: "/requests?type=pending",
       },
       {
         text: "Цуцалсан",
-        url: "/?type=cancelled",
+        url: "/requests?type=cancelled",
       },
     ],
   },
@@ -57,7 +57,7 @@ const MENU_ITEMS: IMenu[] = [
   {
     text: "Аудит",
     url: "/logs",
-    roles: ["admin"],
+    roles: ["admin", "superadmin"],
   },
 ];
 
@@ -65,6 +65,10 @@ const ROLES = [
   {
     text: "Админ",
     value: "admin",
+  },
+  {
+    text: "Супер админ",
+    value: "superadmin",
   },
   {
     text: "Хэрэглэгч",
@@ -75,7 +79,7 @@ const ROLES = [
     value: "citizen",
   },
 ];
-const ENUM_ROLES = ["admin", "user", "citizen"] as const;
+const ENUM_ROLES = ["admin", "superadmin", "user", "citizen"] as const;
 
 // Re-export official fetched administrative divisions
 export { type AdminDivision } from "./admin-divisions-fetched";

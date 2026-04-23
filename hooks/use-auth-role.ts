@@ -6,21 +6,27 @@ export const useAuthRole = () => {
   const hasRole = (allowedRoles: Role | Role[]) => {
     if (!user) return false;
 
-    if (Array.isArray(allowedRoles)) {
-      return allowedRoles.includes(user.role as Role);
+    const requestedRoles = Array.isArray(allowedRoles)
+      ? allowedRoles
+      : [allowedRoles];
+
+    if (user.role === "superadmin" && requestedRoles.includes("admin")) {
+      return true;
     }
 
-    return user.role === allowedRoles;
+    return requestedRoles.includes(user.role as Role);
   };
 
   const isAdmin = () => hasRole("admin");
+  const isSuperAdmin = () => hasRole("superadmin");
   const isUser = () => hasRole("user");
   const isCitizen = () => hasRole("citizen");
-  const isAdminOrUser = () => hasRole(["admin", "user"]);
+  const isAdminOrUser = () => hasRole(["admin", "superadmin", "user"]);
 
   return {
     hasRole,
     isAdmin,
+    isSuperAdmin,
     isUser,
     isCitizen,
     isAdminOrUser,

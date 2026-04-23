@@ -27,7 +27,7 @@ export default function ProfileView() {
   const profile = data?.data;
 
   return (
-    <main className="space-y-8 w-full">
+    <main className="space-y-8 w-full container mx-auto py-4">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between gap-y-2 md:gap-y-0 md:items-center border-b pb-6">
         <div>

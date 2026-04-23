@@ -21,13 +21,13 @@ export default function RootLayout({
   return (
     <html lang="mn">
       <body
-        className={`${fontsConfig.className} antialiased bg-gray-50 max-w-[2000px] mx-auto overflow-x-hidden`}
+        className={`${fontsConfig.className} antialiased bg-gray-50 max-w-[2000px] mx-auto overflow-x-hidden min-h-screen`}
       >
         <Providers>
-          <main>
-            {children}
+          <div className="min-h-screen flex flex-col">
+            <main className="flex-1">{children}</main>
             <Footer />
-          </main>
+          </div>
         </Providers>
       </body>
     </html>

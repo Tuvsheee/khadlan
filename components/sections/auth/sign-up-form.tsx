@@ -11,6 +11,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { signUpSchema, SignUpType } from "@/validations/auth/form-validations";
@@ -75,18 +76,21 @@ export default function SignUpForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="username"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-xs font-medium">
+                Хэрэглэгчийн и-мэйл
+              </FormLabel>
               <FormControl>
                 <Input
                   autoComplete="off"
-                  placeholder="Хэрэглэгчийн и-мэйл"
+                  placeholder="email@example.com"
                   {...field}
-                  className="rounded-lg border border-gray-200 bg-gray-100 px-8 py-6 text-sm font-medium placeholder-gray-500 focus:border-gray-400 focus:bg-white"
+                  className="h-11 rounded-lg border border-gray-200 bg-[#f5f6f7] px-3 text-sm placeholder-gray-500 focus:border-gray-300 focus:bg-white"
                 />
               </FormControl>
               <FormMessage />
@@ -100,12 +104,13 @@ export default function SignUpForm() {
             name="lastName"
             render={({ field }) => (
               <FormItem>
+                <FormLabel className="text-xs font-medium">Овог</FormLabel>
                 <FormControl>
                   <Input
                     autoComplete="off"
                     placeholder="Овог"
                     {...field}
-                    className="rounded-lg border border-gray-200 bg-gray-100 px-8 py-6 text-sm font-medium placeholder-gray-500 focus:border-gray-400 focus:bg-white"
+                    className="h-11 rounded-lg border border-gray-200 bg-[#f5f6f7] px-3 text-sm placeholder-gray-500 focus:border-gray-300 focus:bg-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -118,12 +123,13 @@ export default function SignUpForm() {
             name="firstName"
             render={({ field }) => (
               <FormItem>
+                <FormLabel className="text-xs font-medium">Нэр</FormLabel>
                 <FormControl>
                   <Input
                     autoComplete="off"
                     placeholder="Нэр"
                     {...field}
-                    className="rounded-lg border border-gray-200 bg-gray-100 px-8 py-6 text-sm font-medium placeholder-gray-500 focus:border-gray-400 focus:bg-white"
+                    className="h-11 rounded-lg border border-gray-200 bg-[#f5f6f7] px-3 text-sm placeholder-gray-500 focus:border-gray-300 focus:bg-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -132,7 +138,7 @@ export default function SignUpForm() {
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 pt-1">
           <FormField
             control={form.control}
             name="districtId"
@@ -140,6 +146,7 @@ export default function SignUpForm() {
               <FormItem>
                 <FormControl>
                   <SelectDistricts
+                    layout="auth"
                     onBagKhorooChange={handleBagKhorooChange}
                     onProvinceChange={handleProvinceChange}
                     onDistrictChange={handleDistrictChange}
@@ -157,12 +164,13 @@ export default function SignUpForm() {
             name="regNumber"
             render={({ field }) => (
               <FormItem>
+                <FormLabel className="text-xs font-medium">РД</FormLabel>
                 <FormControl>
                   <Input
                     autoComplete="off"
                     placeholder="РД"
                     {...field}
-                    className="rounded-lg border border-gray-200 bg-gray-100 px-8 py-6 text-sm font-medium placeholder-gray-500 focus:border-gray-400 focus:bg-white uppercase"
+                    className="h-11 rounded-lg border border-gray-200 bg-[#f5f6f7] px-3 text-sm placeholder-gray-500 focus:border-gray-300 focus:bg-white uppercase"
                   />
                 </FormControl>
                 <FormMessage />
@@ -175,13 +183,16 @@ export default function SignUpForm() {
             name="phone"
             render={({ field }) => (
               <FormItem>
+                <FormLabel className="text-xs font-medium">
+                  Утасны дугаар
+                </FormLabel>
                 <FormControl>
                   <Input
                     autoComplete="off"
                     placeholder="Утасны дугаар"
                     {...field}
                     maxLength={8}
-                    className="rounded-lg border border-gray-200 bg-gray-100 px-8 py-6 text-sm font-medium placeholder-gray-500 focus:border-gray-400 focus:bg-white"
+                    className="h-11 rounded-lg border border-gray-200 bg-[#f5f6f7] px-3 text-sm placeholder-gray-500 focus:border-gray-300 focus:bg-white"
                   />
                 </FormControl>
                 <FormMessage />
@@ -195,6 +206,7 @@ export default function SignUpForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-xs font-medium">Нууц үг</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input
@@ -202,7 +214,7 @@ export default function SignUpForm() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Нууц үг"
                     {...field}
-                    className="rounded-lg border border-gray-200 bg-gray-100 px-8 py-6 text-sm font-medium placeholder-gray-500 focus:border-gray-400 focus:bg-white pr-12"
+                    className="h-11 rounded-lg border border-gray-200 bg-[#f5f6f7] px-3 text-sm placeholder-gray-500 focus:border-gray-300 focus:bg-white pr-12"
                   />
                   <Button
                     type="button"
@@ -229,6 +241,9 @@ export default function SignUpForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
+              <FormLabel className="text-xs font-medium">
+                Нууц үг давтах
+              </FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input
@@ -236,7 +251,7 @@ export default function SignUpForm() {
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Нууц үг давтаж оруулах"
                     {...field}
-                    className="rounded-lg border border-gray-200 bg-gray-100 px-8 py-6 text-sm font-medium placeholder-gray-500 focus:border-gray-400 focus:bg-white pr-12"
+                    className="h-11 rounded-lg border border-gray-200 bg-[#f5f6f7] px-3 text-sm placeholder-gray-500 focus:border-gray-300 focus:bg-white pr-12"
                   />
                   <Button
                     type="button"
@@ -258,7 +273,11 @@ export default function SignUpForm() {
           )}
         />
 
-        <Button disabled={isSigningUp} type="submit" className="w-full py-6">
+        <Button
+          disabled={isSigningUp}
+          type="submit"
+          className="w-full h-11 bg-[#0f5e34] hover:bg-[#0b4a2a]"
+        >
           {isSigningUp ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (

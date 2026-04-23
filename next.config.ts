@@ -4,8 +4,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "hadlan.tanusoft.mn",
+        protocol: "http",
+        hostname: "localhost:8080",
       },
     ],
   },

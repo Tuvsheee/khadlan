@@ -1,4 +1,4 @@
-import PublicHomeView from "@/components/sections/home/public-home-view";
+import HomeView from "@/components/sections/home/view";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,6 +6,6 @@ export const metadata: Metadata = {
   description: "Нүүр хуудас",
 };
 
-export default function Home() {
-  return <PublicHomeView />;
+export default function Dashboard() {
+  return <HomeView />;
 }

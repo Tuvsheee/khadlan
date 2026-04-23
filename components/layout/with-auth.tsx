@@ -8,12 +8,13 @@ import { useAuthStore } from "@/hooks/use-auth-store";
 
 const login = "/auth/login";
 const signup = "/auth/signup";
+const home = "/";
 
 // Public routes that don't require authentication
-const PUBLIC_ROUTES = [login, signup];
+const PUBLIC_ROUTES = [home, login, signup];
 
 // Routes that all authenticated users can access
-const ALLOWED_ROUTES = ["/profile", "/profile/edit"] as const;
+const ALLOWED_ROUTES = ["/dashboard", "/profile", "/profile/edit"] as const;
 
 const WithAuth = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
@@ -45,6 +46,11 @@ const WithAuth = ({ children }: { children: React.ReactNode }) => {
     axios.defaults.headers.common["Authorization"] = `Bearer ${user.token}`;
 
     if (PUBLIC_ROUTES.includes(pathname)) {
+      if (pathname === login || pathname === signup) {
+        routerNav.replace("/dashboard");
+        return;
+      }
+
       setLoading(false);
       return;
     }

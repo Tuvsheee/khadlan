@@ -37,9 +37,32 @@ export default function UserAuthForm() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data.username, data.password);
-      router.push("/");
+      router.push("/dashboard");
     } catch (error: any) {
-      toast.error(error?.message || "Authentication failed");
+      const errorMessage = error?.message || "Authentication failed";
+      
+      // Check for backend error messages in Mongolian or English error codes
+      if (
+        errorMessage.includes("USER_NOT_FOUND") ||
+        errorMessage.includes("INVALID_PASSWORD") ||
+        errorMessage.includes("Бүртгэлтэй хэрэглэгч олдсонгүй") ||
+        errorMessage.includes("Нууц үг буруу байна") ||
+        errorMessage.includes("not found") ||
+        errorMessage.includes("incorrect")
+      ) {
+        // Show the standard incorrect credentials message
+        toast.error("Та нэр эсвэл нууц үг буруу байна");
+      } else if (
+        errorMessage.includes("баталгаажуулна") ||
+        errorMessage.includes("verified") ||
+        errorMessage.includes("и-мэйл хаягаа")
+      ) {
+        // Show email verification message
+        toast.error("Та и-мэйл хаягаа баталгаажуулна уу");
+      } else {
+        // Show the actual error message if it's something else
+        toast.error(errorMessage);
+      }
     }
   };
   const loading = form.formState.isSubmitting;
@@ -55,9 +78,15 @@ export default function UserAuthForm() {
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Хэрэглэгчийн нэр</FormLabel>
+                <FormLabel className="text-xs font-medium text-[#0f5e34]">
+                  Хэрэглэгчийн нэр
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder="Хэрэглэгчийн нэр..." {...field} />
+                  <Input
+                    placeholder="Хэрэглэгчийн нэр"
+                    {...field}
+                    className="h-11 bg-[#f5f6f7] border-gray-200"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -68,16 +97,27 @@ export default function UserAuthForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Нууц үг</FormLabel>
+                <FormLabel className="text-xs font-medium text-[#0f5e34]">
+                  Нууц үг
+                </FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="Нууц үг..." {...field} />
+                  <Input
+                    type="password"
+                    placeholder="Нууц үг"
+                    {...field}
+                    className="h-11 bg-[#f5f6f7] border-gray-200"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <Button disabled={loading} className="ml-auto w-full" type="submit">
+          <Button
+            disabled={loading}
+            className="ml-auto w-full h-11 bg-[#0f5e34] hover:bg-[#0b4a2a]"
+            type="submit"
+          >
             Нэвтрэх
           </Button>
         </form>

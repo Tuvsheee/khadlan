@@ -45,29 +45,38 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
   login: async (username: string, password: string) => {
-    const response = await api.post("/auth/login", {
-      username,
-      password,
-    });
+    try {
+      const response = await api.post("/auth/login", {
+        username,
+        password,
+      });
 
-    if (!response.data?.success) {
-      throw new Error(response.data?.message || "Authentication failed");
+      if (!response.data?.success) {
+        throw new Error(response.data?.message || "Authentication failed");
+      }
+
+      const { token, user } = response.data.data;
+      const authUser: AuthUser = {
+        ...user,
+        token,
+      };
+
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ user: authUser, token }),
+        );
+      }
+
+      set({ user: authUser, token });
+    } catch (error: any) {
+      // Extract error message from axios error response
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Authentication failed";
+      throw new Error(errorMessage);
     }
-
-    const { token, user } = response.data.data;
-    const authUser: AuthUser = {
-      ...user,
-      token,
-    };
-
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ user: authUser, token }),
-      );
-    }
-
-    set({ user: authUser, token });
   },
   logout: () => {
     if (typeof window !== "undefined") {

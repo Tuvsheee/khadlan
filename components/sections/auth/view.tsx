@@ -3,21 +3,48 @@ import Link from "next/link";
 
 export default function SignInViewPage() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-gray-950 rounded-2xl shadow-xl p-8 space-y-8">
-          <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">Нэвтрэх</h1>
-            <p className="text-sm text-muted-foreground">
-              Үргэлжлүүлэхийн тулд нэвтэрнэ үү.
-            </p>
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#f4f4f5] p-4 md:p-8">
+      <div className="w-full max-w-5xl rounded-3xl bg-white shadow-xl overflow-hidden border border-gray-100">
+        <div className="grid lg:grid-cols-2">
+          <div className="hidden lg:flex relative min-h-[560px] bg-[url('/images/Background.svg')] bg-cover bg-center p-10 items-end">
+            {/* <div className="absolute inset-0 bg-[#21484c]/35" />
+            <div className="relative z-10 text-white max-w-sm space-y-4">
+              <div className="inline-flex items-center rounded-full border border-white/30 px-3 py-1 text-xs bg-white/10">
+                ЦАХИМ ХҮСЭЛТ
+              </div>
+              <h2 className="text-4xl font-bold leading-tight">
+                Хадлангийн хүсэлтээ илгээгээрэй
+              </h2>
+              <p className="text-sm text-white/80 leading-relaxed">
+                Хадлангийн зориулалтат газар ашиглах хүсэлтийг цахимаар
+                бүртгүүлж, явцыг хянах боломжтой.
+              </p>
+            </div> */}
           </div>
-          <UserAuthForm />
-          <div className="text-center text-sm">
-            Бүртгэлгүй юу?{" "}
-            <Link href="/auth/signup" className="text-primary hover:underline">
-              Бүртгүүлэх
-            </Link>
+
+          <div className="p-8 md:p-12 flex items-center justify-center">
+            <div className="w-full max-w-md space-y-7">
+              <div className="space-y-2 text-center">
+                <h1 className="text-3xl font-semibold text-[#0f5e34]">
+                  Нэвтрэх
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Үргэлжлүүлэхийн тулд нэвтэрнэ үү
+                </p>
+              </div>
+
+              <UserAuthForm />
+
+              <div className="text-center text-sm text-muted-foreground">
+                Бүртгэлгүй юу?{" "}
+                <Link
+                  href="/auth/signup"
+                  className="text-[#0f5e34] hover:underline font-medium"
+                >
+                  Бүртгүүлэх
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>

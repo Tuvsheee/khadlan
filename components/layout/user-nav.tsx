@@ -9,6 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
+import { useQueryUtil } from "@/hooks/use-query";
+import { UserProfileData } from "@/types/user";
 import { LogOut, User, UserCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
@@ -16,24 +18,74 @@ import { Button } from "../ui/button";
 export function UserNav() {
   const { user, logout } = useAuth();
 
+  const { data: profileResponse } = useQueryUtil<{ data: UserProfileData }>({
+    queryKey: ["profile", user?.userId],
+    endpoint: `/auth/${user?.userId}`,
+    enabled: !!user?.userId,
+  });
+
+  const profile = profileResponse?.data;
+  const profileName = [profile?.lastname, profile?.firstname]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+
+  const authName = [user?.lastName, user?.firstName]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+
+  const displayName =
+    profileName || authName || user?.name || user?.username || "Хэрэглэгч";
+
+  const primaryIdentity = user?.email || user?.username || "";
+  const subtitle =
+    primaryIdentity && primaryIdentity !== displayName
+      ? primaryIdentity
+      : user?.role || "";
+
+  if (!user) {
+    return (
+      <div className="flex items-center gap-2">
+        <Button variant="outline" asChild>
+          <Link href="/auth/signup">Бүртгүүлэх</Link>
+        </Button>
+        <Button asChild>
+          <Link href="/auth/login">Нэвтрэх</Link>
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-          <Avatar className="h-9 w-9">
-            <AvatarImage src={`/images/profile-default.svg`} />
-            <AvatarFallback>
-              <UserCircle className="h-5 w-5" />
-            </AvatarFallback>
-          </Avatar>
+        <Button
+          variant="ghost"
+          className="h-auto rounded-full px-2 py-1.5 hover:bg-white/60"
+        >
+          <div className="flex items-center gap-2">
+            <div className="hidden text-right leading-tight md:block">
+              <p className="text-sm font-semibold text-[#1d4ed8]">
+                {displayName}
+              </p>
+              <p className="text-[11px] text-[#6b7280]">{subtitle}</p>
+            </div>
+            <Avatar className="h-9 w-9 border border-white/80 shadow-sm">
+              <AvatarImage src={`/images/profile-default.svg`} />
+              <AvatarFallback className="bg-white">
+                <UserCircle className="h-5 w-5 text-muted-foreground" />
+              </AvatarFallback>
+            </Avatar>
+          </div>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user?.username}</p>
+            <p className="text-sm font-medium leading-none">{displayName}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {user?.role}
+              {subtitle}
             </p>
           </div>
         </DropdownMenuLabel>

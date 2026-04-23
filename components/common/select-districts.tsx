@@ -22,6 +22,7 @@ interface SelectDistrictsProps {
   defaultProvince?: District;
   defaultDistrict?: District;
   defaultBagKhoroo?: District;
+  layout?: "default" | "auth";
 }
 
 const SelectDistricts = ({
@@ -31,6 +32,7 @@ const SelectDistricts = ({
   defaultProvince,
   defaultDistrict,
   defaultBagKhoroo,
+  layout = "default",
 }: SelectDistrictsProps) => {
   const [selectedProvince, setSelectedProvince] = useState<string>(
     defaultProvince?._id || "",
@@ -99,7 +101,13 @@ const SelectDistricts = ({
   };
 
   return (
-    <div className="grid gap-4 sm:grid-cols-3">
+    <div
+      className={
+        layout === "auth"
+          ? "grid gap-4 sm:grid-cols-2"
+          : "grid gap-4 sm:grid-cols-3"
+      }
+    >
       <div className="grid gap-2">
         <Label>Аймаг</Label>
         <Select
@@ -140,7 +148,11 @@ const SelectDistricts = ({
         </Select>
       </div>
 
-      <div className="grid gap-2">
+      <div
+        className={
+          layout === "auth" ? "grid gap-2 sm:col-span-2" : "grid gap-2"
+        }
+      >
         <Label>Баг/Хороо</Label>
         <Select
           value={selectedBagKhoroo}

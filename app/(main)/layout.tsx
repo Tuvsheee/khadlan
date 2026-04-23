@@ -9,7 +9,7 @@ export default function MainLayout({
   return (
     <div className="flex-1 flex flex-col">
       <Navbar />
-      <main className="flex-1 pt-20 px-3 md:px-0 py-5 w-full overflow-auto container mx-auto">
+      <main className="mx-auto w-full flex-1 overflow-auto px-3 pt-[74px] md:px-0">
         {children}
       </main>
       <PaymentInfoDialog />

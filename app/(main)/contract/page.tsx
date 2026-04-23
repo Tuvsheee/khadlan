@@ -119,7 +119,7 @@ export default function ContractPage() {
   }, [previewUrls]);
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-6 py-6 container mx-auto">
       <div className="space-y-2">
         <h1 className="text-3xl font-semibold">Гэрээ</h1>
         <p className="max-w-2xl text-muted-foreground">

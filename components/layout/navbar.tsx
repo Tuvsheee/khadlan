@@ -2,8 +2,11 @@
 
 import { MENU_ITEMS } from "@/constants/data";
 import { useAuth } from "@/hooks/use-auth";
+import { useQueryUtil } from "@/hooks/use-query";
+import { HomeContentResponse } from "@/types/home";
 import { cn } from "@/lib/utils";
-import { ChevronDown, Menu } from "lucide-react";
+import { ChevronDown, Menu, Settings } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -22,8 +25,15 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
+  const { data: homeData } = useQueryUtil<HomeContentResponse>({
+    queryKey: ["home-content"],
+    endpoint: "/home/content",
+    enabled: true,
+  });
+  const logoUrl = homeData?.data?.logoUrl;
+
   const filteredMenuItems = MENU_ITEMS.filter((item) =>
-    item.roles.includes(user?.role as any)
+    item.roles.includes(user?.role as any),
   );
 
   const renderMenuItem = (item: (typeof MENU_ITEMS)[0]) => {
@@ -37,17 +47,17 @@ export default function Navbar() {
               variant="ghost"
               size="sm"
               className={cn(
-                "h-9 px-3 gap-1.5 font-medium relative group",
-                isActive && "text-primary",
-                "after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:bg-primary after:scale-x-0 after:transition-transform hover:after:scale-x-100",
-                isActive && "after:scale-x-100"
+                "group h-9 gap-1.5 px-3 text-sm font-medium",
+                isActive
+                  ? "text-[#1f2937]"
+                  : "text-[#6b7280] hover:text-[#374151]",
               )}
             >
               {item.text}
               <ChevronDown
                 className={cn(
                   "h-4 w-4 transition-transform duration-200",
-                  "group-data-[state=open]:rotate-180"
+                  "group-data-[state=open]:rotate-180",
                 )}
               />
             </Button>
@@ -64,7 +74,7 @@ export default function Navbar() {
                   "py-2.5 px-3 rounded-md cursor-pointer transition-colors duration-200",
                   "focus:bg-accent focus:text-accent-foreground",
                   "data-[highlighted]:bg-accent/50",
-                  pathname === subItem.url && "bg-primary/5"
+                  pathname === subItem.url && "bg-primary/5",
                 )}
               >
                 <a
@@ -73,7 +83,7 @@ export default function Navbar() {
                     "w-full font-medium flex items-center gap-2 text-sm",
                     pathname === subItem.url
                       ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   <span
@@ -81,7 +91,7 @@ export default function Navbar() {
                       "h-1.5 w-1.5 rounded-full transition-colors duration-200",
                       pathname === subItem.url
                         ? "bg-primary"
-                        : "bg-muted-foreground/30"
+                        : "bg-muted-foreground/30",
                     )}
                   />
                   {subItem.text}
@@ -98,11 +108,10 @@ export default function Navbar() {
         key={item.url}
         href={item.url!}
         className={cn(
-          "relative px-3 py-1.5 font-medium transition-colors duration-200",
-          "after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:bg-primary after:scale-x-0 after:transition-transform hover:after:scale-x-100",
+          "px-3 py-1.5 text-sm font-medium transition-colors duration-200",
           pathname === item.url
-            ? "text-primary after:scale-x-100"
-            : "text-muted-foreground hover:text-foreground"
+            ? "text-[#1f2937]"
+            : "text-[#6b7280] hover:text-[#374151]",
         )}
       >
         {item.text}
@@ -111,8 +120,8 @@ export default function Navbar() {
   };
 
   return (
-    <div className="border-b fixed top-0 left-0 right-0 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
-      <div className="flex px-3 justify-between md:px-0 md:justify-start h-16 items-center container mx-auto">
+    <div className="fixed top-0 left-0 right-0 z-50 w-full border-b border-[#e5e7eb] bg-[#f3f4f6]">
+      <div className="mx-auto flex h-[74px] w-full max-w-[1280px] items-center justify-between px-3 md:px-6">
         {/* Mobile Menu Button */}
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTitle className="sr-only">Mobile Menu Button</SheetTitle>
@@ -140,7 +149,7 @@ export default function Navbar() {
                               "block text-sm py-1 transition-colors duration-200",
                               pathname === subItem.url
                                 ? "text-primary font-medium"
-                                : "text-muted-foreground hover:text-foreground"
+                                : "text-muted-foreground hover:text-foreground",
                             )}
                             onClick={() => setIsOpen(false)}
                           >
@@ -160,7 +169,7 @@ export default function Navbar() {
                       "text-sm font-medium transition-colors duration-200",
                       pathname === item.url
                         ? "text-primary"
-                        : "text-muted-foreground hover:text-foreground"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                     onClick={() => setIsOpen(false)}
                   >
@@ -173,16 +182,49 @@ export default function Navbar() {
         </Sheet>
 
         <Link
-          href="/"
-          className="font-semibold text-lg tracking-tight hover:text-primary transition-colors mr-6"
+          href="/dashboard"
+          className="mr-6 flex shrink-0 items-center gap-2"
         >
-          Khadlan.mn
+          {logoUrl ? (
+            <Image
+              src={logoUrl}
+              alt="Khadlan.mn logo"
+              width={120}
+              height={36}
+              className="h-9 w-auto object-contain"
+            />
+          ) : (
+            <>
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                <Settings className="h-3.5 w-3.5" />
+              </span>
+              <span className="text-lg font-semibold tracking-tight text-emerald-700 transition-colors">
+                Khadlan.mn
+              </span>
+            </>
+          )}
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center space-x-1 mx-6 flex-1">
+        <nav className="mx-6 hidden flex-1 items-center justify-center gap-4 lg:flex">
           {filteredMenuItems.map(renderMenuItem)}
         </nav>
+
+        {/* Settings Button for SuperAdmin */}
+        {user?.role === "superadmin" && (
+          <Link
+            href="/"
+            className={cn(
+              "mr-3 hidden items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors duration-200 lg:flex",
+              pathname === "/"
+                ? "bg-emerald-100 text-emerald-700"
+                : "text-[#6b7280] hover:bg-white/60 hover:text-[#374151]",
+            )}
+          >
+            <Settings className="h-4 w-4" />
+            <span>Тохиргоо</span>
+          </Link>
+        )}
 
         {/* User Navigation */}
         <UserNav />
