@@ -105,7 +105,7 @@ export default function PublicHomeView() {
               >
                 <div className="flex items-start justify-between">
                   <Image
-                    src={`/images/${stat.order}`}
+                    src={`/images/1.svg`}
                     alt="Statistic icon"
                     width={15}
                     height={30}
