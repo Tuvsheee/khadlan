@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 import {
   Form,
@@ -29,10 +29,11 @@ import {
 } from "@/components/ui/select";
 import { useMutationUtil } from "@/hooks/use-mutation";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import SelectDistricts from "@/components/common/select-districts";
 import { useQueryUtil } from "@/hooks/use-query";
 import { usePayment } from "@/hooks/use-payment";
+import { getMedia } from "@/lib/utils";
 
 const createRequestSchema = z.object({
   userType: z.enum(["хувь хүн", "бизнес"], {
@@ -67,11 +68,142 @@ function CreateRequestModal() {
     endpoint: "/auth/account/isActive",
   });
 
-  const handleTriggerClick = () => {
-    if (!accountStatus?.isActive) {
-      openPaymentModal();
-      return;
+  const bagKhorooIdValue = useWatch({
+    control: form.control,
+    name: "bagKhorooId",
+  });
+
+  const [hasSignature, setHasSignature] = useState(false);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [signatureDataUrl, setSignatureDataUrl] = useState("");
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+
+  const { data: contractUploads } = useQueryUtil<{
+    success: boolean;
+    message: string;
+    data: Array<{ _id: string; contractFiles: string[] }>;
+  }>({
+    queryKey: ["request-contract-uploads", bagKhorooIdValue],
+    endpoint: "/request/uploadedContracts",
+    params: { bagKhorooId: bagKhorooIdValue },
+    enabled: Boolean(bagKhorooIdValue),
+  });
+
+  const uploadedContractFiles = useMemo<
+    Array<{ uploadId: string; file: string }>
+  >(
+    () =>
+      contractUploads?.data?.flatMap((upload) =>
+        upload.contractFiles.map((file) => ({
+          uploadId: upload._id,
+          file,
+        })),
+      ) ?? [],
+    [contractUploads],
+  );
+
+  const getCanvasPoint = (
+    event:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+
+    const rect = canvas.getBoundingClientRect();
+
+    if ("touches" in event) {
+      const touch = event.touches[0] ?? event.changedTouches[0];
+      return {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top,
+      };
     }
+
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+  };
+
+  const startDraw = (
+    event:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    const { x, y } = getCanvasPoint(event);
+    context.beginPath();
+    context.moveTo(x, y);
+    setIsDrawing(true);
+    setHasSignature(true);
+  };
+
+  const draw = (
+    event:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ) => {
+    if (!isDrawing) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    const { x, y } = getCanvasPoint(event);
+    context.lineTo(x, y);
+    context.strokeStyle = "#1f2937";
+    context.lineWidth = 2;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.stroke();
+  };
+
+  const stopDraw = () => {
+    const canvas = canvasRef.current;
+    if (canvas && hasSignature) {
+      setSignatureDataUrl(canvas.toDataURL("image/png"));
+    }
+    setIsDrawing(false);
+  };
+
+  const clearSignature = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    setHasSignature(false);
+    setSignatureDataUrl("");
+    setIsDrawing(false);
+  };
+
+  useEffect(() => {
+    setHasSignature(false);
+    setSignatureDataUrl("");
+  }, [bagKhorooIdValue, uploadedContractFiles.length]);
+
+  useEffect(() => {
+    if (isReviewOpen) {
+      clearSignature();
+    }
+  }, [isReviewOpen]);
+
+  const handleTriggerClick = () => {
+    // if (!accountStatus?.isActive) {
+    //   openPaymentModal();
+    //   return;
+    // }
     setOpen(true);
   };
 
@@ -86,7 +218,29 @@ function CreateRequestModal() {
   });
 
   const onSubmit = (data: CreateRequestData) => {
+    if (uploadedContractFiles.length > 0) {
+      setHasSignature(false);
+      setSignatureDataUrl("");
+      setIsReviewOpen(true);
+      return;
+    }
+
     mutate({ ...data, landSize: Number(data.landSize) });
+  };
+
+  const handleReviewConfirm = () => {
+    if (!hasSignature || !signatureDataUrl) {
+      toast.error("Гарын үсгээ зурж баталгаажуулна уу");
+      return;
+    }
+
+    const data = form.getValues();
+    mutate({
+      ...data,
+      landSize: Number(data.landSize),
+      contractSignature: signatureDataUrl,
+    });
+    setIsReviewOpen(false);
   };
 
   return (
@@ -124,7 +278,10 @@ function CreateRequestModal() {
                             <SelectDistricts
                               onDistrictChange={field.onChange}
                               onBagKhorooChange={(value) => {
-                                form.setValue("bagKhorooId", value);
+                                form.setValue("bagKhorooId", value, {
+                                  shouldValidate: true,
+                                  shouldDirty: true,
+                                });
                               }}
                             />
                           </FormControl>
@@ -173,6 +330,39 @@ function CreateRequestModal() {
                     />
                   </div>
                 </div>
+                {/* {bagKhorooIdValue ? (
+                  <div className="space-y-3 rounded-lg border border-muted/50 bg-muted/10 p-4">
+                    <h3 className="font-medium">Гэрээний файлууд</h3>
+                    {uploadedContractFiles.length > 0 ? (
+                      <div className="space-y-2">
+                        {uploadedContractFiles.map((entry) => (
+                          <div
+                            key={`${entry.uploadId}-${entry.file}`}
+                            className="rounded-md border border-border bg-background px-3 py-2"
+                          >
+                            <a
+                              href={entry.file}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-sm font-medium text-primary hover:underline"
+                            >
+                              {entry.file.split("/").pop()}
+                            </a>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Тус хаягтай ямар ч гэрээний файл олдсонгүй.
+                      </p>
+                    )}
+                    {uploadedContractFiles.length > 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        Хүсэлт илгээх товч дарахад гэрээ popup-аар харагдана.
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null} */}
 
                 <div className="space-y-2">
                   <h3 className="font-medium">Газрын мэдээлэл</h3>
@@ -226,6 +416,119 @@ function CreateRequestModal() {
           </Form>
         </div>
       </DialogContent>
+      <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <div className="p-6">
+            <DialogHeader>
+              <DialogTitle className="text-xl">
+                Гэрээний файлыг баталгаажуулах
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Доорх файл дээр дарж гэрээний нөхцлийг шалгаад &quot;Би дээрх
+                гэрээний файлыг хараад гэрээний нөхцлийг зөвшөөрч байна&quot;-г
+                тэмдэглээд үргэлжлүүлэх товчийг дарна уу.
+              </p>
+              <div className="space-y-2 rounded-md border border-border bg-background p-4">
+                {uploadedContractFiles.map((entry) => (
+                  <div
+                    key={`${entry.uploadId}-${entry.file}`}
+                    className="rounded-md border border-muted/50 bg-white px-3 py-2"
+                  >
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      {(() => {
+                        const fileUrl = getMedia(entry.file) || entry.file;
+                        return (
+                          <>
+                            <a
+                              href={fileUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-sm font-medium text-primary hover:underline"
+                            >
+                              {entry.file.split("/").pop()}
+                            </a>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <a
+                                href={fileUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center rounded-md border border-border bg-muted px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10"
+                              >
+                                Үзэх
+                              </a>
+                              <a
+                                href={fileUrl}
+                                download
+                                className="inline-flex items-center rounded-md border border-border bg-background px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10"
+                              >
+                                Татах
+                              </a>
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-start gap-3 rounded-md border border-border bg-background p-3">
+                <div className="w-full space-y-2">
+                  <p className="text-sm font-medium">
+                    Энд гарын үсгээ зурна уу
+                  </p>
+                  <canvas
+                    ref={canvasRef}
+                    width={520}
+                    height={170}
+                    onMouseDown={startDraw}
+                    onMouseMove={draw}
+                    onMouseUp={stopDraw}
+                    onMouseLeave={stopDraw}
+                    onTouchStart={startDraw}
+                    onTouchMove={draw}
+                    onTouchEnd={stopDraw}
+                    className="w-full rounded-md border border-dashed border-border bg-white touch-none"
+                  />
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      Гарын үсэг зурсны дараа үргэлжлүүлэх боломжтой.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={clearSignature}
+                    >
+                      Дахин зурах
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              {!hasSignature ? (
+                <p className="text-sm text-destructive">
+                  Баталгаажуулахын тулд гарын үсгээ зурна уу.
+                </p>
+              ) : null}
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => setIsReviewOpen(false)}
+              >
+                Буцах
+              </Button>
+              <Button
+                onClick={handleReviewConfirm}
+                disabled={!hasSignature || isPending}
+              >
+                {isPending ? "Илгээж байна..." : "Үргэлжлүүлэх"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

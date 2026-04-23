@@ -18,6 +18,7 @@ import {
   FileText,
   User,
   Phone,
+  Check,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
@@ -51,20 +52,20 @@ interface UserResponse {
 
 export default function UserList() {
   const params = useSearchParams();
-  const type = params.get("type");
+  const role = params.get("role");
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [activeStatus, setActiveStatus] = useState<boolean | null>(null);
 
   const { data, isLoading } = useQueryUtil<UserResponse>({
-    queryKey: ["users", page, searchQuery, activeStatus, type],
+    queryKey: ["users", page, searchQuery, activeStatus, role],
     endpoint: `/auth/list`,
     params: {
       page: page.toString(),
       search: searchQuery,
       isActive: activeStatus?.toString(),
-      type: type,
+      role: role || undefined,
     },
   });
 
@@ -75,10 +76,50 @@ export default function UserList() {
     successMessage: "Хэрэглэгч амжилттай устгагдлаа",
   });
 
+  const { mutate: changeUserRole } = useMutationUtil({
+    endpoint: "/auth/changeRole",
+    method: "put",
+    queryKey: ["users"],
+    successMessage: "Хэрэглэгчийн төрөл амжилттай өөрчлөгдлөө",
+  });
+
   const handleDeleteUser = (userId: string) => {
     if (window.confirm("Хэрэглэгчийг устгахдаа итгэлтэй байна уу?")) {
       deleteUser({ userId });
     }
+  };
+
+  const handleChangeUserRole = (userId: string, role: string) => {
+    if (!window.confirm("Хэрэглэгчийн төрлийг өөрчлөхөд итгэлтэй байна уу?")) {
+      return;
+    }
+
+    changeUserRole({ userId, role });
+  };
+
+  const roleOptions = [
+    { label: "Админ", value: "admin", className: "bg-blue-500 text-white" },
+    {
+      label: "Хэрэглэгч",
+      value: "user",
+      className: "bg-orange-500 text-white",
+    },
+    {
+      label: "Иргэн",
+      value: "citizen",
+      className: "bg-emerald-500 text-white",
+    },
+  ];
+
+  const getRoleLabel = (role: string) =>
+    roleOptions.find((option) => option.value === role)?.label || "Тодорхойгүй";
+
+  const getRoleButtonClass = (role: string) => {
+    const option = roleOptions.find((item) => item.value === role);
+    return cn(
+      "h-8 min-w-[100px] rounded-full px-3 text-sm font-medium transition",
+      option?.className ?? "bg-slate-100 text-slate-700",
+    );
   };
 
   const statusOptions = [
@@ -207,11 +248,45 @@ export default function UserList() {
                     {user.firstName || "-"}
                   </TableCell>
                   <TableCell className="text-muted-foreground font-medium">
-                    {user.role === "admin"
-                      ? "Админ"
-                      : user.role === "user"
-                      ? "Хэрэглэгч"
-                      : "Иргэн"}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className={cn(
+                            "h-8 min-w-[110px] justify-between rounded-full px-3 text-sm font-medium",
+                            getRoleButtonClass(user.role),
+                          )}
+                        >
+                          {getRoleLabel(user.role)}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-[200px]">
+                        <DropdownMenuLabel>Төрөл сонгох</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {roleOptions.map((option) => (
+                          <DropdownMenuItem
+                            key={option.value}
+                            onClick={() =>
+                              option.value !== user.role &&
+                              handleChangeUserRole(user._id, option.value)
+                            }
+                            className="flex items-center justify-between"
+                          >
+                            <span
+                              className={cn(
+                                option.value === user.role &&
+                                  "font-semibold text-primary",
+                              )}
+                            >
+                              {option.label}
+                            </span>
+                            {option.value === user.role && (
+                              <Check className="h-4 w-4 text-primary" />
+                            )}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                   <TableCell className="font-medium">
                     {user.phone || "-"}
@@ -222,7 +297,7 @@ export default function UserList() {
                         "inline-block px-2 py-1 rounded-2xl text-sm font-medium",
                         user.isActive
                           ? "text-white bg-green-500"
-                          : "text-white bg-destructive"
+                          : "text-white bg-destructive",
                       )}
                     >
                       {user.isActive ? "Идэвхтэй" : "Идэвхгүй"}

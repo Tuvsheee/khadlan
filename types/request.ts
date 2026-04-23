@@ -2,6 +2,10 @@ export type Status = "paid" | "pending" | "cancelled" | "confirmed";
 
 export interface RequestData {
   _id: string;
+  district?: string | null;
+  subDistrict?: string | null;
+  bagKhoroo?: string | null;
+  createdAt?: string;
   sender: {
     _id: string;
     firstName: string | null;
@@ -22,6 +26,7 @@ export interface RequestDetailData {
   street: string;
   landName: string;
   landSize: number;
+  contractSignature?: string;
   filePath: string | string[];
   contractFiles: string | string[];
   status: Status;

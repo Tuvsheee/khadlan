@@ -10,12 +10,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { LogOut, User, UserCircle } from "lucide-react";
-import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 
 export function UserNav() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <DropdownMenu>
@@ -50,7 +49,7 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer text-red-600"
-          onClick={() => signOut()}
+          onClick={() => logout()}
         >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Гарах</span>

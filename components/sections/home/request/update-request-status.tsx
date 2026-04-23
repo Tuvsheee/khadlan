@@ -17,7 +17,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { RoleGate } from "@/components/common/auth/role-gate";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { cn, getMedia } from "@/lib/utils";
 
 const UpdateRequestStatus = ({
   detail,
@@ -129,10 +129,10 @@ const UpdateRequestStatus = ({
                   detail.status === "confirmed"
                     ? "default"
                     : detail.status === "paid"
-                    ? "secondary"
-                    : detail.status === "pending"
-                    ? "outline"
-                    : "destructive"
+                      ? "secondary"
+                      : detail.status === "pending"
+                        ? "outline"
+                        : "destructive"
                 }
                 className={cn("px-3", STATUS_MAP[detail.status].color)}
               >
@@ -162,8 +162,8 @@ const UpdateRequestStatus = ({
                           {detail.status === "pending"
                             ? `Хадлан талбай ${index + 1}`
                             : detail.status === "paid"
-                            ? `Төлбөр төлсөн баримт ${index + 1}`
-                            : `Хүсэлтийн файл ${index + 1}`}
+                              ? `Төлбөр төлсөн баримт ${index + 1}`
+                              : `Хүсэлтийн файл ${index + 1}`}
                         </p>
                         <Button
                           variant="ghost"
@@ -171,15 +171,20 @@ const UpdateRequestStatus = ({
                           asChild
                           className="h-8 px-2 mt-1"
                         >
-                          <Link
-                            href={file}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1"
-                          >
-                            <Download className="h-3 w-3" />
-                            <span className="text-xs">Татах</span>
-                          </Link>
+                          {(() => {
+                            const fileUrl = getMedia(file) || file;
+                            return (
+                              <Link
+                                href={fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1"
+                              >
+                                <Download className="h-3 w-3" />
+                                <span className="text-xs">Татах</span>
+                              </Link>
+                            );
+                          })()}
                         </Button>
                       </div>
                     </div>
@@ -187,6 +192,25 @@ const UpdateRequestStatus = ({
                 </div>
               </div>
             )}
+
+            {detail.contractSignature ? (
+              <div className="rounded-lg border p-4 space-y-3">
+                <h4 className="text-sm font-medium flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-primary" />
+                  Гэрээний гарын үсэг
+                </h4>
+                <div className="rounded-md border bg-white p-3">
+                  <Image
+                    src={detail.contractSignature}
+                    alt="Гэрээний гарын үсэг"
+                    width={520}
+                    height={180}
+                    unoptimized
+                    className="h-auto w-full max-w-[520px] rounded-sm object-contain"
+                  />
+                </div>
+              </div>
+            ) : null}
 
             {detail.status !== "paid" && (
               <>
@@ -234,7 +258,7 @@ const UpdateRequestStatus = ({
                 </div>
 
                 {/* File Upload Section */}
-                <div className="space-y-3">
+                {/* <div className="space-y-3">
                   <h4 className="text-sm font-medium flex items-center gap-2">
                     <FileText className="h-4 w-4 text-primary" />
                     {selectedStatus === "paid"
@@ -332,7 +356,7 @@ const UpdateRequestStatus = ({
                         : "Файл сонгох (олон файл боломжтой)"}
                     </p>
                   </div>
-                </div>
+                </div> */}
 
                 <Button
                   onClick={handleSubmit}

@@ -6,6 +6,11 @@ import Footer from "@/components/layout/footer";
 
 export const metadata: Metadata = {
   ...siteConfig,
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -14,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="mn">
       <body
         className={`${fontsConfig.className} antialiased bg-gray-50 max-w-[2000px] mx-auto overflow-x-hidden`}
       >

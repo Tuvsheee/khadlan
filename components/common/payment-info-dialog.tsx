@@ -84,7 +84,7 @@ export default function PaymentInfoDialog() {
                 <div className="text-sm text-muted-foreground">
                   Хүлээн авагч
                 </div>
-                <div className="font-medium">Гео инженер сүрвэй” ХХК</div>
+                <div className="font-medium">TANUSOFT” ХХК</div>
               </div>
               <div className="px-6 py-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
                 <div className="text-sm text-muted-foreground">

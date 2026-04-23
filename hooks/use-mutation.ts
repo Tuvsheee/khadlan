@@ -27,11 +27,18 @@ export function useMutationUtil<TData, TInput>({
 
   return useMutation<TData, Error, TInput>({
     mutationFn: async (data: TInput) => {
+      const headers: Record<string, string> = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      if (contentType !== "multipart/form-data") {
+        headers["Content-Type"] = contentType;
+      } else {
+        headers["Content-Type"] = undefined as any;
+      }
+
       const config: AxiosRequestConfig = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": contentType,
-        },
+        headers,
       };
 
       let response;
