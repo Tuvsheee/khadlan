@@ -52,7 +52,7 @@ interface UserResponse {
 
 export default function UserList() {
   const params = useSearchParams();
-  const role = params.get("role");
+  const role = params?.get("role") ?? null;
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
