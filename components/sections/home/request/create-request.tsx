@@ -257,7 +257,7 @@ function CreateRequestModal() {
         <div className="p-6 md:p-7 bg-gradient-to-b from-white to-slate-50/40">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
-              <MapPin className="h-5 w-5 text-[#0f5e34]" />
+              <MapPin className="h-5 w-5 text-[#1A3A3E]" />
               Хадлан ашиглах хүсэлт илгээх
             </DialogTitle>
             <p className="text-muted-foreground text-sm leading-relaxed">

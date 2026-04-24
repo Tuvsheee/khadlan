@@ -40,7 +40,7 @@ export default function UserAuthForm() {
       router.push("/dashboard");
     } catch (error: any) {
       const errorMessage = error?.message || "Authentication failed";
-      
+
       // Check for backend error messages in Mongolian or English error codes
       if (
         errorMessage.includes("USER_NOT_FOUND") ||
@@ -78,7 +78,7 @@ export default function UserAuthForm() {
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs font-medium text-[#0f5e34]">
+                <FormLabel className="text-xs font-medium text-[#1A3A3E]">
                   Хэрэглэгчийн нэр
                 </FormLabel>
                 <FormControl>
@@ -97,7 +97,7 @@ export default function UserAuthForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs font-medium text-[#0f5e34]">
+                <FormLabel className="text-xs font-medium text-[#1A3A3E]">
                   Нууц үг
                 </FormLabel>
                 <FormControl>

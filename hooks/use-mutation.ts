@@ -33,13 +33,15 @@ export function useMutationUtil<TData, TInput>({
 
       if (contentType !== "multipart/form-data") {
         headers["Content-Type"] = contentType;
-      } else {
-        headers["Content-Type"] = undefined as any;
       }
 
       const config: AxiosRequestConfig = {
         headers,
       };
+
+      if (data instanceof FormData) {
+        delete config.headers?.["Content-Type"];
+      }
 
       let response;
 

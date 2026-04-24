@@ -91,17 +91,17 @@ export default function PublicHomeView() {
   };
 
   return (
-    <main className=" w-full h-screen">
+    <main className="w-full min-h-screen md:h-screen">
       <HomeHeader
         content={resolvedContent}
         onCtaClick={() => router.push("/auth/login")}
       >
-        <section className="grid gap-12 md:grid-cols-4 mb-12">
+        <section className="grid gap-4 sm:gap-6 md:gap-12 md:grid-cols-4 mb-6 sm:mb-8 md:mb-12">
           {(isLoading ? DEFAULT_HOME_CONTENT.stats : resolvedContent.stats).map(
             (stat) => (
               <article
                 key={`${stat.order}-${stat.title}`}
-                className="rounded-3xl border border-white/20 bg-white/5 backdrop-blur-[2px] text-white p-5 shadow-md"
+                className="rounded-2xl md:rounded-3xl border border-white/20 bg-white/5 backdrop-blur-[2px] text-white p-4 md:p-5 shadow-md"
               >
                 <div className="flex items-start justify-between">
                   <Image
@@ -111,17 +111,19 @@ export default function PublicHomeView() {
                     height={30}
                     className="h-6 w-auto opacity-90"
                   />
-                  <p className="text-3xl font-extrabold text-white/35 leading-none">
+                  <p className="text-2xl md:text-3xl font-extrabold text-white/35 leading-none">
                     {stat.order}
                   </p>
                 </div>
-                <p className="mt-3 text-5xl font-extrabold leading-none">
+                <p className="mt-2 md:mt-3 text-4xl md:text-5xl font-extrabold leading-none">
                   {stat.value}
                 </p>
                 <p className="mt-2 text-xs uppercase tracking-wide text-amber-300 font-semibold">
                   {stat.title}
                 </p>
-                <p className="mt-2 text-sm text-white/75">{stat.subtitle}</p>
+                <p className="mt-1.5 md:mt-2 text-sm text-white/75">
+                  {stat.subtitle}
+                </p>
               </article>
             ),
           )}
