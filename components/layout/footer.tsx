@@ -81,11 +81,11 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-sm text-white/60">
                 <MapPin className="h-4 w-4 shrink-0 text-amber-400" />
-                Улаанбаатар, Монгол
+                Сэлэнгэ аймаг, Орхонтуул сум
               </li>
               <li className="flex items-center gap-3 text-sm text-white/60">
                 <Phone className="h-4 w-4 shrink-0 text-amber-400" />
-                +976 9999-9999
+                +976 99996907
               </li>
               <li className="flex items-center gap-3 text-sm text-white/60">
                 <Mail className="h-4 w-4 shrink-0 text-amber-400" />
