@@ -2,6 +2,7 @@ export type Status = "paid" | "pending" | "cancelled" | "confirmed";
 
 export interface RequestData {
   _id: string;
+  bagKhorooId?: string | null;
   district?: string | null;
   subDistrict?: string | null;
   bagKhoroo?: string | null;

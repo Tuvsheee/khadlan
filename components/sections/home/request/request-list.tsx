@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryUtil } from "@/hooks/use-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Pagination from "@/components/common/pagination";
 import RequestDetail from "./request-detail";
@@ -29,6 +29,7 @@ import Filter from "@/components/common/filter";
 import Image from "next/image";
 import { useAuth } from "@/hooks/use-auth";
 import RequestStats from "./request-stats";
+import { AIMAGS, SUMS, BAG_KHOROOS } from "@/constants/data";
 
 export default function RequestList() {
   const router = useRouter();
@@ -48,7 +49,7 @@ export default function RequestList() {
   const handleStatusChange = (newStatus: Status | null) => {
     setStatus(newStatus);
     setCurrentPage(1);
-    
+
     // Update URL params
     const url = new URL(window.location.href);
     if (newStatus) {
@@ -95,6 +96,39 @@ export default function RequestList() {
     paid: "bg-blue-100 text-blue-700 border border-blue-200",
     pending: "bg-amber-100 text-amber-700 border border-amber-200",
     cancelled: "bg-red-100 text-red-700 border border-red-200",
+  };
+
+  const bagKhorooMap = useMemo(
+    () => new Map(BAG_KHOROOS.map((item) => [item._id, item])),
+    [],
+  );
+
+  const sumMap = useMemo(
+    () => new Map(SUMS.map((item) => [item._id, item])),
+    [],
+  );
+
+  const aimagMap = useMemo(
+    () => new Map(AIMAGS.map((item) => [item._id, item])),
+    [],
+  );
+
+  const resolveAddress = (request: RequestData) => {
+    const bagKhorooEntry = request.bagKhorooId
+      ? bagKhorooMap.get(request.bagKhorooId)
+      : undefined;
+    const sumEntry = bagKhorooEntry?.parentId
+      ? sumMap.get(bagKhorooEntry.parentId)
+      : undefined;
+    const aimagEntry = sumEntry?.parentId
+      ? aimagMap.get(sumEntry.parentId)
+      : undefined;
+
+    return {
+      district: request.district || aimagEntry?.name || "Мэдээлэлгүй",
+      subDistrict: request.subDistrict || sumEntry?.name || "",
+      bagKhoroo: request.bagKhoroo || bagKhorooEntry?.name || "Мэдээлэлгүй",
+    };
   };
 
   return (
@@ -228,81 +262,84 @@ export default function RequestList() {
                 </TableCell>
               </TableRow>
             ) : (
-              sortedRows.map((request) => (
-                <TableRow
-                  key={request._id}
-                  className="cursor-pointer hover:bg-slate-50/60"
-                  onClick={() => setSelectedRequest(request._id)}
-                >
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center">
-                        {request.sender?.profileImageUrl ? (
-                          <Image
-                            src={request.sender.profileImageUrl}
-                            alt="User avatar"
-                            width={36}
-                            height={36}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <User className="h-4 w-4 text-primary" />
+              sortedRows.map((request) => {
+                const address = resolveAddress(request);
+                return (
+                  <TableRow
+                    key={request._id}
+                    className="cursor-pointer hover:bg-slate-50/60"
+                    onClick={() => setSelectedRequest(request._id)}
+                  >
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center">
+                          {request.sender?.profileImageUrl ? (
+                            <Image
+                              src={request.sender.profileImageUrl}
+                              alt="User avatar"
+                              width={36}
+                              height={36}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <User className="h-4 w-4 text-primary" />
+                          )}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-slate-800">
+                            {(request.sender?.lastName || "-") +
+                              " " +
+                              (request.sender?.firstName || "-")}
+                          </span>
+                          <span className="text-xs text-slate-400">
+                            Илгээгчийн мэдээлэл
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium text-slate-700">
+                        {request.sender?.regNumber || "Регистр оруулаагүй"}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium text-emerald-700">
+                        {request?.landSize} га
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium text-slate-700">
+                        {address.district}
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          {address.subDistrict}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium text-slate-700">
+                        {address.bagKhoroo}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <p
+                        className={cn(
+                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
+                          statusBadgeClass[request.status],
                         )}
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-medium text-slate-800">
-                          {(request.sender?.lastName || "-") +
-                            " " +
-                            (request.sender?.firstName || "-")}
-                        </span>
-                        <span className="text-xs text-slate-400">
-                          Илгээгчийн мэдээлэл
-                        </span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium text-slate-700">
-                      {request.sender?.regNumber || "Регистр оруулаагүй"}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium text-emerald-700">
-                      {request?.landSize} га
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium text-slate-700">
-                      {request.district || "Мэдээлэлгүй"}
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        {request.subDistrict || ""}
+                      >
+                        <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                        {STATUS_MAP[request.status].label}
                       </p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium text-slate-700">
-                      {request.bagKhoroo || "Мэдээлэлгүй"}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <p
-                      className={cn(
-                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
-                        statusBadgeClass[request.status],
-                      )}
-                    >
-                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                      {STATUS_MAP[request.status].label}
-                    </p>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="text-sm text-slate-600">
-                      {request.createdAt &&
-                        format(new Date(request.createdAt), "yyyy.MM.dd")}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="text-sm text-slate-600">
+                        {request.createdAt &&
+                          format(new Date(request.createdAt), "yyyy.MM.dd")}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
