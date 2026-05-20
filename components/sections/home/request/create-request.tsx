@@ -36,7 +36,7 @@ import { usePayment } from "@/hooks/use-payment";
 import { getMedia } from "@/lib/utils";
 
 const createRequestSchema = z.object({
-  userType: z.enum(["хувь хүн", "бизнес"], {
+  userType: z.enum(["малчин өрх", "мал бүхий өрх", "бизнес"], {
     required_error: "Хэрэглэгчийн төрлийг сонгоно уу",
   }),
   subDistrictId: z.string().min(1, "Дүүрэг/Аймаг оруулна уу"),
@@ -53,7 +53,7 @@ function CreateRequestModal() {
   const form = useForm<CreateRequestData>({
     resolver: zodResolver(createRequestSchema),
     defaultValues: {
-      userType: "хувь хүн",
+      userType: "малчин өрх",
       subDistrictId: "",
       bagKhorooId: "",
       street: "",
@@ -218,14 +218,9 @@ function CreateRequestModal() {
   });
 
   const onSubmit = (data: CreateRequestData) => {
-    if (uploadedContractFiles.length > 0) {
-      setHasSignature(false);
-      setSignatureDataUrl("");
-      setIsReviewOpen(true);
-      return;
-    }
-
-    mutate({ ...data, landSize: Number(data.landSize) });
+    setHasSignature(false);
+    setSignatureDataUrl("");
+    setIsReviewOpen(true);
   };
 
   const handleReviewConfirm = () => {
@@ -335,7 +330,12 @@ function CreateRequestModal() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="хувь хүн">Хувь хүн</SelectItem>
+                              <SelectItem value="малчин өрх">
+                                Малчин өрх
+                              </SelectItem>
+                              <SelectItem value="мал бүхий өрх">
+                                Мал бүхий өрх
+                              </SelectItem>
                               <SelectItem value="бизнес">Бизнес</SelectItem>
                             </SelectContent>
                           </Select>
@@ -454,6 +454,11 @@ function CreateRequestModal() {
                 тэмдэглээд үргэлжлүүлэх товчийг дарна уу.
               </p>
               <div className="space-y-2 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                {uploadedContractFiles.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-2">
+                    Энэ хороонд гэрээний файл байхгүй байна.
+                  </p>
+                )}
                 {uploadedContractFiles.map((entry) => (
                   <div
                     key={`${entry.uploadId}-${entry.file}`}

@@ -133,7 +133,9 @@ export default function RequestList() {
 
   return (
     <div className="relative space-y-4 rounded-2xl border bg-white p-4 md:p-5 shadow-sm">
-      {isUser && <RequestStats status={status} variant="user" />}
+      {showRequestTabs && (
+        <RequestStats status={status} variant={isUser ? "user" : "default"} />
+      )}
 
       {showRequestTabs && (
         <div className="flex flex-wrap items-center gap-2">

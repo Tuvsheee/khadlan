@@ -27,6 +27,7 @@ export interface RequestDetailData {
   street: string;
   landName: string;
   landSize: number;
+  userType?: string;
   contractSignature?: string;
   filePath: string | string[];
   contractFiles: string | string[];
