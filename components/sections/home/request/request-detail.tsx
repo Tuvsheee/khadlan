@@ -57,6 +57,24 @@ export default function RequestDetailModal({
       : [detail.contractFiles]
     : [];
 
+  const googleMapUrl =
+    detail?.googleMapUrl && detail.googleMapUrl.trim() !== ""
+      ? detail.googleMapUrl
+      : detail?.mapCoordinates?.latitude != null &&
+          detail?.mapCoordinates?.longitude != null
+        ? `https://www.google.com/maps?q=${detail.mapCoordinates.latitude},${detail.mapCoordinates.longitude}`
+        : "";
+
+  const isKmzLike = (file: string) => {
+    try {
+      const parsed = new URL(file, "http://localhost");
+      const normalizedPath = parsed.pathname.toLowerCase();
+      return /\.(kmz|kml|zip)$/i.test(normalizedPath);
+    } catch {
+      return /\.(kmz|kml|zip)(\?.*)?(#.*)?$/i.test(file.toLowerCase());
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogTitle className="sr-only">
@@ -291,7 +309,9 @@ export default function RequestDetailModal({
                                             >
                                               <Download className="h-3 w-3" />
                                               <span className="text-xs">
-                                                Татах
+                                                {isKmzLike(file)
+                                                  ? "KMZ татах"
+                                                  : "Татах"}
                                               </span>
                                             </Link>
                                           );
@@ -319,32 +339,35 @@ export default function RequestDetailModal({
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-sm font-medium truncate">
-                                        Хадлангийн газрын талбай {index + 1}
+                                        {isKmzLike(file)
+                                          ? `Газрын координат ${index + 1}`
+                                          : `Хадлангийн газрын талбай ${index + 1}`}
                                       </p>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        asChild
-                                        className="h-8 px-2 mt-1"
-                                      >
-                                        {(() => {
-                                          const fileUrl =
-                                            getMedia(file) || file;
-                                          return (
-                                            <Link
-                                              href={fileUrl}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="flex items-center gap-1"
-                                            >
-                                              <Download className="h-3 w-3" />
-                                              <span className="text-xs">
-                                                Татах
-                                              </span>
-                                            </Link>
-                                          );
-                                        })()}
-                                      </Button>
+                                      <div className="flex items-center gap-1 mt-1">
+                                        {googleMapUrl && isKmzLike(file) && (
+                                          <a
+                                            href={googleMapUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-primary hover:bg-accent hover:text-accent-foreground"
+                                          >
+                                            <MapPin className="h-3 w-3" />
+                                            Google Maps
+                                          </a>
+                                        )}
+                                        <a
+                                          href={getMedia(file) || file}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          download
+                                          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-primary hover:bg-accent hover:text-accent-foreground"
+                                        >
+                                          <Download className="h-3 w-3" />
+                                          {isKmzLike(file)
+                                            ? "KMZ татах"
+                                            : "Татах"}
+                                        </a>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
@@ -364,6 +387,7 @@ export default function RequestDetailModal({
               <RoleGate allowedRoles={["citizen"]}>
                 <div>
                   {detail.status === "paid" &&
+                    detail.grassInfo &&
                     detail.grassInfo.boodol === 0 &&
                     detail.grassInfo.buhal === 0 && (
                       <GrassInfoForm id={detail.requestId} />

@@ -120,7 +120,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 w-full border-b border-[#e5e7eb] bg-[#f3f4f6]">
+    <div className="fixed top-0 left-0 right-0 z-50 w-full border-b border-white/40 bg-white/50 backdrop-blur-lg shadow-sm">
       <div className="mx-auto flex h-[74px] w-full max-w-[1280px] items-center justify-between px-3 md:px-6">
         {/* Mobile Menu Button */}
         <Sheet open={isOpen} onOpenChange={setIsOpen}>

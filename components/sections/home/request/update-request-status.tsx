@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Upload, Download, X, File, FileText } from "lucide-react";
+import { Upload, Download, X, File, FileText, MapPin } from "lucide-react";
 import { useState } from "react";
 import { useMutationUtil } from "@/hooks/use-mutation";
 import { RequestDetailData, STATUS_MAP } from "@/types/request";
@@ -29,6 +29,28 @@ const UpdateRequestStatus = ({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+
+  const selectedFileLabel =
+    selectedStatus === "confirmed"
+      ? "KMZ/KML файл"
+      : selectedStatus === "paid"
+        ? "Төлбөр төлсөн баримт"
+        : "Хавсаргах файл";
+
+  const selectedFileAccept =
+    selectedStatus === "confirmed"
+      ? ".kmz,.kml,.zip"
+      : selectedStatus === "paid"
+        ? ".pdf,.png,.jpg,.jpeg"
+        : "*/*";
+
+  const selectedFileMultiple = selectedStatus === "paid";
+
+  const googleMapUrl =
+    detail.googleMapUrl ||
+    (detail.mapCoordinates
+      ? `https://www.google.com/maps?q=${detail.mapCoordinates.latitude},${detail.mapCoordinates.longitude}`
+      : "");
 
   // Normalize filePath to array
   const filePathArray = detail.filePath
@@ -79,6 +101,7 @@ const UpdateRequestStatus = ({
 
   const handleStatusChange = (status: string) => {
     setSelectedStatus(status);
+    clearFiles();
   };
 
   const handleSubmit = () => {
@@ -86,7 +109,10 @@ const UpdateRequestStatus = ({
 
     const formData = new FormData();
 
-    if (selectedStatus === "paid" && selectedFiles.length === 0) {
+    if (
+      (selectedStatus === "paid" || selectedStatus === "confirmed") &&
+      selectedFiles.length === 0
+    ) {
       return;
     }
 
@@ -163,8 +189,28 @@ const UpdateRequestStatus = ({
                             ? `Хадлан талбай ${index + 1}`
                             : detail.status === "paid"
                               ? `Төлбөр төлсөн баримт ${index + 1}`
-                              : `Хүсэлтийн файл ${index + 1}`}
+                              : /\.(kmz|kml|zip)$/i.test(file)
+                                ? `Газрын координат ${index + 1}`
+                                : `Хүсэлтийн файл ${index + 1}`}
                         </p>
+                        {googleMapUrl && /\.(kmz|kml|zip)$/i.test(file) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            asChild
+                            className="h-8 px-2 mt-1 mr-2"
+                          >
+                            <a
+                              href={googleMapUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1"
+                            >
+                              <MapPin className="h-3 w-3" />
+                              <span className="text-xs">Google Maps</span>
+                            </a>
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="sm"
@@ -258,14 +304,10 @@ const UpdateRequestStatus = ({
                 </div>
 
                 {/* File Upload Section */}
-                {/* <div className="space-y-3">
+                <div className="space-y-3">
                   <h4 className="text-sm font-medium flex items-center gap-2">
                     <FileText className="h-4 w-4 text-primary" />
-                    {selectedStatus === "paid"
-                      ? "Төлбөр төлсөн баримт"
-                      : selectedStatus === "confirmed"
-                      ? "Гэрээний файл"
-                      : "Хавсаргах файл"}
+                    {selectedFileLabel}
                   </h4>
 
                   {selectedFiles.length > 0 && (
@@ -294,7 +336,7 @@ const UpdateRequestStatus = ({
                                     .slice(0, index + 1)
                                     .filter((f) => f.type.startsWith("image/"))
                                     .length ===
-                                  i + 1
+                                  i + 1,
                               )
                             : null;
 
@@ -345,23 +387,28 @@ const UpdateRequestStatus = ({
                   <div className="grid gap-3">
                     <Input
                       type="file"
-                      multiple
+                      multiple={selectedFileMultiple}
+                      accept={selectedFileAccept}
                       onChange={handleFileChange}
                       className="cursor-pointer"
                       disabled={isUpdating}
                     />
                     <p className="text-sm text-muted-foreground">
-                      {selectedStatus === "paid"
-                        ? "Төлбөр төлсөн баримт заавал хавсаргана уу (олон файл боломжтой)"
-                        : "Файл сонгох (олон файл боломжтой)"}
+                      {selectedStatus === "confirmed"
+                        ? "KMZ/KML/ZIP файл заавал хавсаргана уу"
+                        : selectedStatus === "paid"
+                          ? "Төлбөр төлсөн баримт хавсаргана уу (олон файл боломжтой)"
+                          : "Файл сонгох"}
                     </p>
                   </div>
-                </div> */}
+                </div>
 
                 <Button
                   onClick={handleSubmit}
                   disabled={
-                    (selectedStatus === "paid" && selectedFiles.length === 0) ||
+                    ((selectedStatus === "paid" ||
+                      selectedStatus === "confirmed") &&
+                      selectedFiles.length === 0) ||
                     !selectedStatus ||
                     isUpdating
                   }
@@ -370,6 +417,31 @@ const UpdateRequestStatus = ({
                 >
                   {isUpdating ? "Илгээж байна..." : "Төлөв шинэчлэх"}
                 </Button>
+
+                {googleMapUrl && (
+                  <div className="rounded-lg border border-dashed p-4 bg-blue-50/60">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <h4 className="text-sm font-semibold text-blue-900">
+                          Газрын байршил бэлэн байна
+                        </h4>
+                        <p className="text-sm text-blue-800">
+                          KMZ файлаас координат уншигдсан тул Google Maps дээр
+                          шууд нээж болно.
+                        </p>
+                      </div>
+                      <Button asChild>
+                        <a
+                          href={googleMapUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Google Maps дээр нээх
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>

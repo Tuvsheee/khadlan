@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { useAuthStore } from "@/hooks/use-auth-store";
+import { useQueryClient } from "@tanstack/react-query";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Хэрэглэгчийн нэр оруулна уу"),
@@ -33,10 +34,12 @@ export default function UserAuthForm() {
   });
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
+  const queryClient = useQueryClient();
 
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data.username, data.password);
+      queryClient.invalidateQueries();
       router.push("/dashboard");
     } catch (error: any) {
       const errorMessage = error?.message || "Authentication failed";

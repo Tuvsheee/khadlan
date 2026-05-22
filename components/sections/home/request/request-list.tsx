@@ -71,6 +71,8 @@ export default function RequestList() {
       search: debouncedSearch,
       type: status,
     },
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,7 +134,7 @@ export default function RequestList() {
   };
 
   return (
-    <div className="relative space-y-4 rounded-2xl border bg-white p-4 md:p-5 shadow-sm">
+    <div className="relative space-y-4 rounded-2xl border border-white/40 bg-white/70 backdrop-blur-md p-4 md:p-5 shadow-sm">
       {/* {showRequestTabs && (
         <RequestStats status={status} variant={isUser ? "user" : "default"} />
       )} */}

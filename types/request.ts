@@ -35,6 +35,11 @@ export interface RequestDetailData {
   bagKhoroo: string;
   subDistrict: string;
   district: string;
+  mapCoordinates?: {
+    latitude: number;
+    longitude: number;
+  } | null;
+  googleMapUrl?: string;
   sender: {
     isActive: boolean;
     email: string;
