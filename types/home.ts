@@ -3,6 +3,7 @@ export interface HomeStat {
   value: string;
   title: string;
   subtitle: string;
+  link?: string;
 }
 
 export interface HomeContent {

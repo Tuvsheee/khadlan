@@ -32,11 +32,15 @@ export default function PublicHomeView() {
     null,
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [statLinkFiles, setStatLinkFiles] = useState<
+    Record<number, File | null>
+  >({});
 
   useEffect(() => {
     setForm(resolvedContent);
     setBackgroundImageFile(null);
     setLogoFile(null);
+    setStatLinkFiles({});
   }, [resolvedContent]);
 
   const updateMutation = useMutationUtil<HomeContentResponse, FormData>({
@@ -69,6 +73,10 @@ export default function PublicHomeView() {
     });
   };
 
+  const handleStatLinkChange = (index: number, file: File | null) => {
+    setStatLinkFiles((prev) => ({ ...prev, [index]: file }));
+  };
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -87,6 +95,10 @@ export default function PublicHomeView() {
       formData.append("logo", logoFile);
     }
 
+    Object.entries(statLinkFiles).forEach(([index, file]) => {
+      if (file) formData.append(`statLink_${index}`, file);
+    });
+
     updateMutation.mutate(formData);
   };
 
@@ -103,27 +115,61 @@ export default function PublicHomeView() {
                 key={`${stat.order}-${stat.title}`}
                 className="rounded-2xl md:rounded-3xl border border-white/20 bg-white/5 backdrop-blur-[2px] text-white p-4 md:p-5 shadow-md"
               >
-                <div className="flex items-start justify-between">
-                  <Image
-                    src={`/images/1.svg`}
-                    alt="Statistic icon"
-                    width={15}
-                    height={30}
-                    className="h-6 w-auto opacity-90"
-                  />
-                  <p className="text-2xl md:text-3xl font-extrabold text-white/35 leading-none">
-                    {stat.order}
-                  </p>
-                </div>
-                <p className="mt-2 md:mt-3 text-4xl md:text-5xl font-extrabold leading-none">
-                  {stat.value}
-                </p>
-                <p className="mt-2 text-xs uppercase tracking-wide text-amber-300 font-semibold">
-                  {stat.title}
-                </p>
-                <p className="mt-1.5 md:mt-2 text-sm text-white/75">
-                  {stat.subtitle}
-                </p>
+                {stat.link ? (
+                  <a
+                    href={stat.link}
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block group"
+                  >
+                    <div className="flex items-start justify-between">
+                      <Image
+                        src={`/images/1.svg`}
+                        alt="Statistic icon"
+                        width={15}
+                        height={30}
+                        className="h-6 w-auto opacity-90"
+                      />
+                      <p className="text-2xl md:text-3xl font-extrabold text-white/35 leading-none">
+                        {stat.order}
+                      </p>
+                    </div>
+                    <p className="mt-2 md:mt-3 text-4xl md:text-5xl font-extrabold leading-none">
+                      {stat.value}
+                    </p>
+                    <p className="mt-2 text-xs uppercase tracking-wide text-amber-300 font-semibold group-hover:underline">
+                      {stat.title}
+                    </p>
+                    <p className="mt-1.5 md:mt-2 text-sm text-white/75">
+                      {stat.subtitle}
+                    </p>
+                  </a>
+                ) : (
+                  <>
+                    <div className="flex items-start justify-between">
+                      <Image
+                        src={`/images/1.svg`}
+                        alt="Statistic icon"
+                        width={15}
+                        height={30}
+                        className="h-6 w-auto opacity-90"
+                      />
+                      <p className="text-2xl md:text-3xl font-extrabold text-white/35 leading-none">
+                        {stat.order}
+                      </p>
+                    </div>
+                    <p className="mt-2 md:mt-3 text-4xl md:text-5xl font-extrabold leading-none">
+                      {stat.value}
+                    </p>
+                    <p className="mt-2 text-xs uppercase tracking-wide text-amber-300 font-semibold">
+                      {stat.title}
+                    </p>
+                    <p className="mt-1.5 md:mt-2 text-sm text-white/75">
+                      {stat.subtitle}
+                    </p>
+                  </>
+                )}
               </article>
             ),
           )}
@@ -137,6 +183,7 @@ export default function PublicHomeView() {
           onBackgroundImageChange={setBackgroundImageFile}
           onLogoChange={setLogoFile}
           onStatChange={handleStatChange}
+          onStatLinkChange={handleStatLinkChange}
           onSubmit={handleSubmit}
           isPending={updateMutation.isPending}
         />

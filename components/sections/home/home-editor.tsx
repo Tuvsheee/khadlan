@@ -11,6 +11,7 @@ interface HomeEditorProps {
   onBackgroundImageChange: (file: File | null) => void;
   onLogoChange: (file: File | null) => void;
   onStatChange: (index: number, key: keyof HomeStat, value: string) => void;
+  onStatLinkChange: (index: number, file: File | null) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   isPending: boolean;
 }
@@ -21,6 +22,7 @@ export default function HomeEditor({
   onBackgroundImageChange,
   onLogoChange,
   onStatChange,
+  onStatLinkChange,
   onSubmit,
   isPending,
 }: HomeEditorProps) {
@@ -122,36 +124,62 @@ export default function HomeEditor({
             {form.stats.map((stat, index) => (
               <div
                 key={`${stat.order}-${index}`}
-                className="rounded-xl border bg-muted/20 p-4 grid gap-3 md:grid-cols-4"
+                className="rounded-xl border bg-muted/20 p-4 space-y-3"
               >
-                <Input
-                  value={stat.order}
-                  onChange={(event) =>
-                    onStatChange(index, "order", event.target.value)
-                  }
-                  placeholder="01"
-                />
-                <Input
-                  value={stat.value}
-                  onChange={(event) =>
-                    onStatChange(index, "value", event.target.value)
-                  }
-                  placeholder="21"
-                />
-                <Input
-                  value={stat.title}
-                  onChange={(event) =>
-                    onStatChange(index, "title", event.target.value)
-                  }
-                  placeholder="Гарчиг"
-                />
-                <Input
-                  value={stat.subtitle}
-                  onChange={(event) =>
-                    onStatChange(index, "subtitle", event.target.value)
-                  }
-                  placeholder="Тайлбар"
-                />
+                <div className="grid gap-3 md:grid-cols-4">
+                  <Input
+                    value={stat.order}
+                    onChange={(event) =>
+                      onStatChange(index, "order", event.target.value)
+                    }
+                    placeholder="01"
+                  />
+                  <Input
+                    value={stat.value}
+                    onChange={(event) =>
+                      onStatChange(index, "value", event.target.value)
+                    }
+                    placeholder="21"
+                  />
+                  <Input
+                    value={stat.title}
+                    onChange={(event) =>
+                      onStatChange(index, "title", event.target.value)
+                    }
+                    placeholder="Гарчиг"
+                  />
+                  <Input
+                    value={stat.subtitle}
+                    onChange={(event) =>
+                      onStatChange(index, "subtitle", event.target.value)
+                    }
+                    placeholder="Тайлбар"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">
+                    Холбоос файл ({stat.order} карт) —{" "}
+                    {stat.link ? (
+                      <a
+                        href={stat.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary underline"
+                      >
+                        одоогийн файл
+                      </a>
+                    ) : (
+                      "байхгүй"
+                    )}
+                  </Label>
+                  <Input
+                    type="file"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx"
+                    onChange={(event) =>
+                      onStatLinkChange(index, event.target.files?.[0] || null)
+                    }
+                  />
+                </div>
               </div>
             ))}
           </div>
