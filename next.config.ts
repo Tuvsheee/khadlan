@@ -5,11 +5,14 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "http",
-        hostname: "localhost:8080",
+        hostname: "localhost",
+        port: "8080",
+        pathname: "/uploads/**",
       },
       {
         protocol: "https",
         hostname: "hadlan.tanusoft.mn",
+        pathname: "/**",
       },
     ],
   },
