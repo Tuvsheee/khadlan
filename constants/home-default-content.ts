@@ -32,5 +32,11 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
       title: "Хянагдаж буй хүсэлт",
       subtitle: "Одоогоор шалгагдаж байгаа",
     },
+    {
+      order: "05",
+      value: "—",
+      title: "Зохиогчийн эрх",
+      subtitle: "Зохиогчийн эрхийн баримт бичиг",
+    },
   ],
 };
