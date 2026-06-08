@@ -108,77 +108,70 @@ export default function PublicHomeView() {
         content={resolvedContent}
         onCtaClick={() => router.push("/auth/login")}
       >
-        <section className="grid gap-4 sm:gap-6 md:gap-12 md:grid-cols-4 mb-6 sm:mb-8 md:mb-12">
+        <section className="grid gap-4 sm:gap-6 md:gap-12 md:grid-cols-5 mb-6 sm:mb-8 md:mb-12">
           {(isLoading ? DEFAULT_HOME_CONTENT.stats : resolvedContent.stats).map(
-            (stat) => {
-              const isFullWidth =
-                stat.order === "05" || stat.title === "Зохиогчийн эрх";
-
-              return (
-                <article
-                  key={`${stat.order}-${stat.title}`}
-                  className={`rounded-2xl md:rounded-3xl border border-white/20 bg-white/5 backdrop-blur-[2px] text-white p-4 md:p-5 shadow-md ${
-                    isFullWidth ? "md:col-span-4" : ""
-                  }`}
-                >
-                  {stat.link ? (
-                    <a
-                      href={stat.link}
-                      download
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block group"
-                    >
-                      <div className="flex items-start justify-between">
-                        <Image
-                          src={`/images/1.svg`}
-                          alt="Statistic icon"
-                          width={15}
-                          height={30}
-                          className="h-6 w-auto opacity-90"
-                        />
-                        <p className="text-2xl md:text-3xl font-extrabold text-white/35 leading-none">
-                          {stat.order}
-                        </p>
-                      </div>
-                      <p className="mt-2 md:mt-3 text-4xl md:text-5xl font-extrabold leading-none">
-                        {stat.value}
+            (stat) => (
+              <article
+                key={`${stat.order}-${stat.title}`}
+                className="rounded-2xl md:rounded-3xl border border-white/20 bg-white/5 backdrop-blur-[2px] text-white p-4 md:p-5 shadow-md"
+              >
+                {stat.link ? (
+                  <a
+                    href={stat.link}
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block group"
+                  >
+                    <div className="flex items-start justify-between">
+                      <Image
+                        src={`/images/1.svg`}
+                        alt="Statistic icon"
+                        width={15}
+                        height={30}
+                        className="h-6 w-auto opacity-90"
+                      />
+                      <p className="text-2xl md:text-3xl font-extrabold text-white/35 leading-none">
+                        {stat.order}
                       </p>
-                      <p className="mt-2 text-xs uppercase tracking-wide text-amber-300 font-semibold group-hover:underline">
-                        {stat.title}
+                    </div>
+                    <p className="mt-2 md:mt-3 text-4xl md:text-5xl font-extrabold leading-none">
+                      {stat.value}
+                    </p>
+                    <p className="mt-2 text-xs uppercase tracking-wide text-amber-300 font-semibold group-hover:underline">
+                      {stat.title}
+                    </p>
+                    <p className="mt-1.5 md:mt-2 text-sm text-white/75">
+                      {stat.subtitle}
+                    </p>
+                  </a>
+                ) : (
+                  <>
+                    <div className="flex items-start justify-between">
+                      <Image
+                        src={`/images/1.svg`}
+                        alt="Statistic icon"
+                        width={15}
+                        height={30}
+                        className="h-6 w-auto opacity-90"
+                      />
+                      <p className="text-2xl md:text-3xl font-extrabold text-white/35 leading-none">
+                        {stat.order}
                       </p>
-                      <p className="mt-1.5 md:mt-2 text-sm text-white/75">
-                        {stat.subtitle}
-                      </p>
-                    </a>
-                  ) : (
-                    <>
-                      <div className="flex items-start justify-between">
-                        <Image
-                          src={`/images/1.svg`}
-                          alt="Statistic icon"
-                          width={15}
-                          height={30}
-                          className="h-6 w-auto opacity-90"
-                        />
-                        <p className="text-2xl md:text-3xl font-extrabold text-white/35 leading-none">
-                          {stat.order}
-                        </p>
-                      </div>
-                      <p className="mt-2 md:mt-3 text-4xl md:text-5xl font-extrabold leading-none">
-                        {stat.value}
-                      </p>
-                      <p className="mt-2 text-xs uppercase tracking-wide text-amber-300 font-semibold">
-                        {stat.title}
-                      </p>
-                      <p className="mt-1.5 md:mt-2 text-sm text-white/75">
-                        {stat.subtitle}
-                      </p>
-                    </>
-                  )}
-                </article>
-              );
-            },
+                    </div>
+                    <p className="mt-2 md:mt-3 text-4xl md:text-5xl font-extrabold leading-none">
+                      {stat.value}
+                    </p>
+                    <p className="mt-2 text-xs uppercase tracking-wide text-amber-300 font-semibold">
+                      {stat.title}
+                    </p>
+                    <p className="mt-1.5 md:mt-2 text-sm text-white/75">
+                      {stat.subtitle}
+                    </p>
+                  </>
+                )}
+              </article>
+            ),
           )}
         </section>
       </HomeHeader>
