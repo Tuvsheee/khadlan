@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Mail, MapPin, Phone, Leaf } from "lucide-react";
 import Image from "next/image";
 import { useQueryUtil } from "@/hooks/use-query";
@@ -98,10 +99,14 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/10">
-        <div className="container mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-xs text-white/40">
-            © {currentYear} Khadlan.mn — Бүх эрх хуулиар хамгаалагдсан.
-          </p>
+        <div className="container mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 relative">
+          <div className="flex items-center gap-3">
+            <p className="text-xs text-white/40">
+              © {currentYear} Khadlan.mn — Бүх эрх хуулиар хамгаалагдсан.
+            </p>
+            <FooterAuthorImage />
+          </div>
+
           <p className="text-xs text-white/40">
             Хөгжүүлэгч:{" "}
             <span className="text-amber-400 font-medium">TANUSOFT ХХК</span>
@@ -109,5 +114,49 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterAuthorImage() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="text-xs text-white/40 hover:text-amber-400 transition-colors underline"
+        aria-expanded={open}
+      >
+        Зохиогчийн эрх
+      </button>
+
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={() => setOpen(false)}
+            aria-hidden
+          />
+
+          <div className="relative max-w-[90vw] max-h-[80vh] rounded bg-white p-4 shadow-lg">
+            <button
+              onClick={() => setOpen(false)}
+              className="absolute -top-2 -right-2 rounded-full bg-white p-1 text-sm shadow"
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <Image
+              src="/images/zohiogchinerh.jpg"
+              alt="Зохиогчийн эрх"
+              width={420}
+              height={260}
+              className="object-contain"
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }
