@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "hadlan.tanusoft.mn",
+        hostname: "khadlan.tanusoft.mn",
         pathname: "/**",
       },
     ],
