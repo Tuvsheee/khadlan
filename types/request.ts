@@ -32,6 +32,7 @@ export interface RequestDetailData {
   filePath: string | string[];
   contractFiles: string | string[];
   status: Status;
+  approvalChecks?: Record<string, boolean>;
   bagKhoroo: string;
   subDistrict: string;
   district: string;

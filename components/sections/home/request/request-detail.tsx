@@ -80,11 +80,11 @@ export default function RequestDetailModal({
       <DialogTitle className="sr-only">
         Хадлангийн хүсэлтийн дэлгэрэнгүй
       </DialogTitle>
-      <DialogContent className="max-w-[95vw] max-h-[90vh] overflow-y-auto md:max-w-[800px] p-2 md:p-3">
-        <div className="px-6 py-4 border-b bg-muted/40">
+      <DialogContent className="max-h-[92vh] max-w-[96vw] overflow-hidden p-0 md:max-w-[920px]">
+        <div className="sticky top-0 z-10 border-b bg-white px-5 py-4 md:px-6">
           <div className="flex flex-col gap-4">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
-              <h2 className="text-xl font-semibold">
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <h2 className="text-xl font-semibold text-slate-900">
                 Хадлангийн хүсэлтийн дэлгэрэнгүй
               </h2>
               {!isLoading && detail && (
@@ -114,7 +114,7 @@ export default function RequestDetailModal({
             </div>
 
             {!isLoading && detail && (
-              <div className="flex flex-col md:flex-row md:items-center md:gap-4 text-sm text-muted-foreground">
+              <div className="flex flex-col gap-2 text-sm text-slate-500 md:flex-row md:items-center md:gap-4">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4" />
                   <span>
@@ -135,7 +135,7 @@ export default function RequestDetailModal({
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="max-h-[calc(92vh-96px)] overflow-y-auto bg-slate-50 p-4 md:p-6">
           {isLoading ? (
             <div className="space-y-4">
               <Skeleton className="h-4 w-[200px]" />
@@ -143,9 +143,9 @@ export default function RequestDetailModal({
               <Skeleton className="h-4 w-[180px]" />
             </div>
           ) : detail ? (
-            <div className="space-y-6">
+            <div className="space-y-5">
               <div className="grid gap-6 md:grid-cols-2">
-                <Card>
+                <Card className="border-slate-200 bg-white shadow-sm">
                   <CardContent className="p-6">
                     <div className="space-y-4">
                       <h3 className="font-semibold flex items-center gap-2 text-primary">
@@ -197,7 +197,7 @@ export default function RequestDetailModal({
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-slate-200 bg-white shadow-sm">
                   <CardContent className="p-6">
                     <div className="space-y-4">
                       <h3 className="font-semibold flex items-center gap-2 text-primary">
@@ -266,7 +266,7 @@ export default function RequestDetailModal({
               </div>
 
               {(filePathArray.length > 0 || contractFilesArray.length > 0) && (
-                <Card>
+                <Card className="border-slate-200 bg-white shadow-sm">
                   <CardContent className="p-6">
                     <div className="space-y-4">
                       <h3 className="font-semibold flex items-center gap-2 text-primary">

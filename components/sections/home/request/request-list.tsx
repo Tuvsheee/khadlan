@@ -11,7 +11,15 @@ import {
   STATUS_MAP,
   Status,
 } from "@/types/request";
-import { FileText, User, Search } from "lucide-react";
+import {
+  CalendarDays,
+  ChevronRight,
+  FileText,
+  MapPin,
+  Ruler,
+  Search,
+  User,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -100,6 +108,13 @@ export default function RequestList() {
     cancelled: "bg-red-100 text-red-700 border border-red-200",
   };
 
+  const statusDotClass: Record<Status, string> = {
+    confirmed: "bg-green-500",
+    paid: "bg-blue-500",
+    pending: "bg-amber-500",
+    cancelled: "bg-red-500",
+  };
+
   const bagKhorooMap = useMemo(
     () => new Map(BAG_KHOROOS.map((item) => [item._id, item])),
     [],
@@ -133,14 +148,38 @@ export default function RequestList() {
     };
   };
 
+  const getSenderName = (request: RequestData) =>
+    `${request.sender?.lastName || "-"} ${request.sender?.firstName || "-"}`;
+
+  const getCreatedDate = (createdAt?: string) =>
+    createdAt ? format(new Date(createdAt), "yyyy.MM.dd") : "-";
+
+  const totalRequests = data?.pagination?.total ?? sortedRows.length;
+
   return (
-    <div className="relative space-y-4 rounded-2xl border border-white/40 bg-white/70 backdrop-blur-md p-4 md:p-5 shadow-sm">
+    <div className="relative space-y-5 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:p-5">
       {/* {showRequestTabs && (
         <RequestStats status={status} variant={isUser ? "user" : "default"} />
       )} */}
 
+      <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">
+            Хүсэлтийн жагсаалт
+          </h2>
+          <p className="text-sm text-slate-500">
+            {totalRequests} хүсэлт
+            {status ? ` • ${STATUS_MAP[status].label}` : ""}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+          <span className="h-2 w-2 rounded-full bg-emerald-500" />
+          Шинэчлэгдсэн жагсаалт
+        </div>
+      </div>
+
       {showRequestTabs && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
           {tabOptions.map((tab) => {
             const isActive = status === tab.value;
             return (
@@ -149,10 +188,10 @@ export default function RequestList() {
                 type="button"
                 onClick={() => handleStatusChange(tab.value)}
                 className={cn(
-                  "h-9 px-4 rounded-full text-sm font-medium border transition-colors",
+                  "h-9 rounded-md px-3 text-sm font-medium transition-colors md:px-4",
                   isActive
-                    ? "bg-[#0b3d6d] border-[#0b3d6d] text-white"
-                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50",
+                    ? "bg-white text-slate-950 shadow-sm"
+                    : "text-slate-600 hover:bg-white/70 hover:text-slate-900",
                 )}
               >
                 {tab.label}
@@ -163,14 +202,14 @@ export default function RequestList() {
       )}
 
       {/* Search and Filter Section */}
-      <div className="flex flex-col md:flex-row md:items-center gap-3">
+      <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50/70 p-3 md:flex-row md:items-center">
         <div className="relative flex-1 w-full md:max-w-lg">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Нэр, регистрийн дугаараар хайх..."
             value={search}
             onChange={handleSearch}
-            className="pl-9 w-full h-10 rounded-full bg-slate-50 border-slate-200"
+            className="h-10 w-full rounded-md border-slate-200 bg-white pl-9 shadow-none"
           />
         </div>
 
@@ -210,29 +249,29 @@ export default function RequestList() {
       </div>
 
       {/* Table Section */}
-      <div className="rounded-xl text-nowrap border border-slate-200 overflow-hidden">
-        <Table>
+      <div className="hidden overflow-hidden rounded-lg border border-slate-200 md:block">
+        <Table className="min-w-[980px]">
           <TableHeader>
-            <TableRow className="bg-slate-50/70 hover:bg-slate-50/70">
-              <TableHead className="font-semibold text-slate-700">
-                Овог нэр
+            <TableRow className="bg-slate-50 hover:bg-slate-50">
+              <TableHead className="w-[28%] font-semibold text-slate-600">
+                Иргэн
               </TableHead>
-              <TableHead className="font-semibold text-slate-700">
+              <TableHead className="w-[14%] font-semibold text-slate-600">
                 Регистрийн дугаар
               </TableHead>
-              <TableHead className="font-semibold text-slate-700">
-                Газрын хэмжээ
+              <TableHead className="w-[12%] font-semibold text-slate-600">
+                Хэмжээ
               </TableHead>
-              <TableHead className="font-semibold text-slate-700">
-                Аймаг сум
+              <TableHead className="w-[22%] font-semibold text-slate-600">
+                Байршил
               </TableHead>
-              <TableHead className="font-semibold text-slate-700">
+              <TableHead className="w-[12%] font-semibold text-slate-600">
                 Баг
               </TableHead>
-              <TableHead className="font-semibold text-slate-700">
+              <TableHead className="w-[12%] font-semibold text-slate-600">
                 Төлөв
               </TableHead>
-              <TableHead className="text-right font-semibold text-slate-700">
+              <TableHead className="w-[10%] text-right font-semibold text-slate-600">
                 Огноо
               </TableHead>
             </TableRow>
@@ -271,74 +310,81 @@ export default function RequestList() {
                 return (
                   <TableRow
                     key={request._id}
-                    className="cursor-pointer hover:bg-slate-50/60"
+                    className="group cursor-pointer bg-white hover:bg-slate-50"
                     onClick={() => setSelectedRequest(request._id)}
                   >
-                    <TableCell>
+                    <TableCell className="py-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
                           {request.sender?.profileImageUrl ? (
                             <Image
                               src={request.sender.profileImageUrl}
                               alt="User avatar"
-                              width={36}
-                              height={36}
+                              width={40}
+                              height={40}
                               className="h-full w-full object-cover"
                             />
                           ) : (
-                            <User className="h-4 w-4 text-primary" />
+                            <User className="h-4 w-4 text-slate-500" />
                           )}
                         </div>
-                        <div className="flex flex-col">
-                          <span className="font-medium text-slate-800">
-                            {(request.sender?.lastName || "-") +
-                              " " +
-                              (request.sender?.firstName || "-")}
+                        <div className="min-w-0">
+                          <span className="block truncate font-semibold text-slate-900">
+                            {getSenderName(request)}
                           </span>
-                          <span className="text-xs text-slate-400">
-                            Илгээгчийн мэдээлэл
+                          <span className="block truncate text-xs text-slate-500">
+                            ID: {request._id}
                           </span>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="font-medium text-slate-700">
-                        {request.sender?.regNumber || "Регистр оруулаагүй"}
-                      </div>
+                    <TableCell className="font-medium text-slate-700">
+                      {request.sender?.regNumber || "-"}
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium text-emerald-700">
+                      <div className="inline-flex items-center gap-2 rounded-md bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-700">
+                        <Ruler className="h-3.5 w-3.5" />
                         {request?.landSize} га
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium text-slate-700">
-                        {address.district}
-                        <p className="text-xs text-slate-400 mt-0.5">
-                          {address.subDistrict}
-                        </p>
+                      <div className="flex items-start gap-2">
+                        <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                        <div className="min-w-0">
+                          <p className="truncate font-medium text-slate-800">
+                            {address.district}
+                          </p>
+                          <p className="mt-0.5 truncate text-xs text-slate-500">
+                            {address.subDistrict || "-"}
+                          </p>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium text-slate-700">
+                      <div className="truncate font-medium text-slate-700">
                         {address.bagKhoroo}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <p
+                      <span
                         className={cn(
-                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
+                          "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold",
                           statusBadgeClass[request.status],
                         )}
                       >
-                        <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                        <span
+                          className={cn(
+                            "h-1.5 w-1.5 rounded-full",
+                            statusDotClass[request.status],
+                          )}
+                        />
                         {STATUS_MAP[request.status].label}
-                      </p>
+                      </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="text-sm text-slate-600">
-                        {request.createdAt &&
-                          format(new Date(request.createdAt), "yyyy.MM.dd")}
+                      <div className="flex items-center justify-end gap-2 text-sm font-medium text-slate-600">
+                        {getCreatedDate(request.createdAt)}
+                        <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-500" />
                       </div>
                     </TableCell>
                   </TableRow>
@@ -347,6 +393,114 @@ export default function RequestList() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      <div className="space-y-3 md:hidden">
+        {isLoading ? (
+          <div className="flex h-32 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <span>Уншиж байна...</span>
+          </div>
+        ) : data?.data.length === 0 ? (
+          <div className="flex h-44 flex-col items-center justify-center rounded-lg border border-slate-200 bg-white px-6 text-center">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <FileText className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="font-semibold">
+              {search ? "Хайлтын илэрц олдсонгүй" : "Хүсэлт олдсонгүй"}
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {search
+                ? "Хайлтын үгээ өөрчлөөд дахин оролдоно уу."
+                : "Одоогоор харуулах хүсэлт алга байна."}
+            </p>
+          </div>
+        ) : (
+          sortedRows.map((request) => {
+            const address = resolveAddress(request);
+            return (
+              <button
+                key={request._id}
+                type="button"
+                onClick={() => setSelectedRequest(request._id)}
+                className="w-full rounded-lg border border-slate-200 bg-white p-4 text-left shadow-sm transition-colors hover:bg-slate-50"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
+                      {request.sender?.profileImageUrl ? (
+                        <Image
+                          src={request.sender.profileImageUrl}
+                          alt="User avatar"
+                          width={40}
+                          height={40}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <User className="h-4 w-4 text-slate-500" />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-slate-900">
+                        {getSenderName(request)}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {request.sender?.regNumber || "-"}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="mt-2 h-4 w-4 shrink-0 text-slate-400" />
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <div className="rounded-md bg-slate-50 p-3">
+                    <p className="text-xs font-medium text-slate-500">Хэмжээ</p>
+                    <p className="mt-1 font-semibold text-emerald-700">
+                      {request.landSize} га
+                    </p>
+                  </div>
+                  <div className="rounded-md bg-slate-50 p-3">
+                    <p className="text-xs font-medium text-slate-500">Огноо</p>
+                    <p className="mt-1 flex items-center gap-1 font-semibold text-slate-700">
+                      <CalendarDays className="h-3.5 w-3.5" />
+                      {getCreatedDate(request.createdAt)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex items-start gap-2 text-sm text-slate-700">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                  <p className="min-w-0">
+                    <span className="block truncate font-medium">
+                      {address.district}
+                      {address.subDistrict ? `, ${address.subDistrict}` : ""}
+                    </span>
+                    <span className="block truncate text-xs text-slate-500">
+                      {address.bagKhoroo}
+                    </span>
+                  </p>
+                </div>
+
+                <div className="mt-4">
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold",
+                      statusBadgeClass[request.status],
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "h-1.5 w-1.5 rounded-full",
+                        statusDotClass[request.status],
+                      )}
+                    />
+                    {STATUS_MAP[request.status].label}
+                  </span>
+                </div>
+              </button>
+            );
+          })
+        )}
       </div>
       {/* Pagination */}
 
