@@ -44,6 +44,7 @@ export default function RequestDetailModal({
   });
 
   const detail = data?.data;
+  const displayStatus = detail?.status === "paid" ? "pending" : detail?.status;
 
   const filePathArray = detail?.filePath
     ? Array.isArray(detail.filePath)
@@ -92,23 +93,19 @@ export default function RequestDetailModal({
                   variant="outline"
                   className={cn(
                     "px-3 py-1",
-                    detail.status === "confirmed" &&
+                    displayStatus === "confirmed" &&
                       "bg-green-500 text-white border-0",
-                    detail.status === "paid" &&
-                      "bg-blue-500 text-white border-0",
-                    detail.status === "pending" &&
+                    displayStatus === "pending" &&
                       "bg-orange-500 text-white border-0",
-                    detail.status === "cancelled" &&
+                    displayStatus === "cancelled" &&
                       "bg-red-500 text-white border-0",
                   )}
                 >
-                  {detail.status === "confirmed"
+                  {displayStatus === "confirmed"
                     ? "Баталгаажсан"
-                    : detail.status === "paid"
-                      ? "Төлбөр төлөгдсөн"
-                      : detail.status === "pending"
-                        ? "Хүлээгдэж буй"
-                        : "Цуцлагдсан"}
+                    : displayStatus === "pending"
+                      ? "Хүлээгдэж буй"
+                      : "Цуцлагдсан"}
                 </Badge>
               )}
             </div>

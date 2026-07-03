@@ -64,7 +64,6 @@ const UpdateRequestStatus = ({
   const checkedCount = APPROVAL_CHECK_ITEMS.filter(
     (item) => approvalChecks[item.key],
   ).length;
-
   useEffect(() => {
     setApprovalChecks(getInitialApprovalChecks(detail.approvalChecks));
   }, [detail.approvalChecks]);
@@ -74,6 +73,21 @@ const UpdateRequestStatus = ({
     (detail.mapCoordinates
       ? `https://www.google.com/maps?q=${detail.mapCoordinates.latitude},${detail.mapCoordinates.longitude}`
       : "");
+  const existingFilePaths = detail.filePath
+    ? Array.isArray(detail.filePath)
+      ? detail.filePath
+      : [detail.filePath]
+    : [];
+  const hasExistingMapFile = existingFilePaths.some((file) => {
+    try {
+      const parsed = new URL(file, "http://localhost");
+      return /\.(kmz|kml|zip)$/i.test(parsed.pathname);
+    } catch {
+      return /\.(kmz|kml|zip)(\?.*)?(#.*)?$/i.test(file);
+    }
+  });
+  const isReviewStatus = detail.status === "pending" || detail.status === "paid";
+  const displayStatus = detail.status === "paid" ? "pending" : detail.status;
 
   const selectedFileLabel =
     selectedStatus === "confirmed"
@@ -150,7 +164,7 @@ const UpdateRequestStatus = ({
   };
 
   const handleApprovalCheckChange = (key: string, checked: boolean) => {
-    if (detail.status !== "pending" || isSavingApprovalChecks) return;
+    if (!isReviewStatus || isSavingApprovalChecks) return;
 
     const previousChecks = approvalChecks;
     const nextChecks = {
@@ -173,7 +187,8 @@ const UpdateRequestStatus = ({
     if (!selectedStatus) return;
     if (selectedStatus === "confirmed" && !allApprovalChecksChecked) return;
     if (
-      (selectedStatus === "paid" || selectedStatus === "confirmed") &&
+      (selectedStatus === "paid" ||
+        (selectedStatus === "confirmed" && !hasExistingMapFile)) &&
       selectedFiles.length === 0
     ) {
       return;
@@ -196,9 +211,10 @@ const UpdateRequestStatus = ({
   };
 
   const showPaidOption = detail.status === "confirmed";
-  const showConfirmedOption = detail.status === "pending";
+  const showConfirmedOption = isReviewStatus;
   const requiresFile =
-    selectedStatus === "paid" || selectedStatus === "confirmed";
+    selectedStatus === "paid" ||
+    (selectedStatus === "confirmed" && !hasExistingMapFile);
   const submitDisabled =
     !selectedStatus ||
     isUpdating ||
@@ -224,15 +240,15 @@ const UpdateRequestStatus = ({
             </div>
             <div className="flex items-center gap-2 text-sm text-slate-600">
               Одоогийн төлөв
-              <Badge className={cn("px-3", STATUS_MAP[detail.status].color)}>
-                {STATUS_MAP[detail.status].label}
+              <Badge className={cn("px-3", STATUS_MAP[displayStatus].color)}>
+                {STATUS_MAP[displayStatus].label}
               </Badge>
             </div>
           </div>
         </div>
 
         <div className="space-y-5 p-5">
-          {detail.status !== "paid" && (
+          {detail.status !== "cancelled" && (
             <>
               <div className="rounded-lg border border-slate-200 bg-white">
                 <div className="flex flex-col gap-3 border-b border-slate-200 px-4 py-3 md:flex-row md:items-center md:justify-between">
@@ -268,7 +284,7 @@ const UpdateRequestStatus = ({
                       <button
                         key={item.key}
                         type="button"
-                        disabled={detail.status !== "pending" || isSavingApprovalChecks}
+                        disabled={!isReviewStatus || isSavingApprovalChecks}
                         onClick={() =>
                           handleApprovalCheckChange(item.key, !checked)
                         }
@@ -277,7 +293,7 @@ const UpdateRequestStatus = ({
                           checked
                             ? "border-emerald-200 bg-emerald-50 text-emerald-900"
                             : "border-slate-200 bg-white text-slate-800 hover:bg-slate-50",
-                          (detail.status !== "pending" ||
+                          (!isReviewStatus ||
                             isSavingApprovalChecks) &&
                             "cursor-not-allowed opacity-70",
                         )}
@@ -300,7 +316,7 @@ const UpdateRequestStatus = ({
                   })}
                 </div>
 
-                {!allApprovalChecksChecked && detail.status === "pending" && (
+                {!allApprovalChecksChecked && isReviewStatus && (
                   <div className="border-t border-slate-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                     Бүх хүн “Шалгасан” гэж тэмдэглэсний дараа хүсэлтийг баталгаажуулах боломжтой.
                   </div>
