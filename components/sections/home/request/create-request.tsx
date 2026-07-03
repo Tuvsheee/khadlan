@@ -44,6 +44,7 @@ const createRequestSchema = z.object({
   street: z.string().min(1, "Гудамж/Хороо оруулна уу"),
   landSize: z.string().min(1, "Газрын хэмжээ оруулна уу"),
   landName: z.string().min(1, "Газрын нэр оруулна уу"),
+  isPaid: z.boolean().default(false),
 });
 
 type CreateRequestData = z.infer<typeof createRequestSchema>;
@@ -59,6 +60,7 @@ function CreateRequestModal() {
       street: "",
       landSize: "",
       landName: "",
+      isPaid: false,
     },
   });
 
@@ -234,6 +236,7 @@ function CreateRequestModal() {
       ...data,
       landSize: Number(data.landSize),
       contractSignature: signatureDataUrl,
+      ...(data.isPaid ? { status: "paid" } : {}),
     });
     setIsReviewOpen(false);
   };
@@ -426,6 +429,36 @@ function CreateRequestModal() {
                   </div>
                 </div>
               </div>
+
+              <FormField
+                control={form.control}
+                name="isPaid"
+                render={({ field }) => (
+                  <FormItem className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <label className="flex cursor-pointer items-start gap-3">
+                      <FormControl>
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={(event) =>
+                            field.onChange(event.target.checked)
+                          }
+                          className="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#0f5e34] accent-[#0f5e34]"
+                        />
+                      </FormControl>
+                      <span className="space-y-1">
+                        <span className="block text-sm font-semibold text-slate-800">
+                          Хадлангийн зөвшөөрлийн төлбөр төлсөн
+                        </span>
+                        <span className="block text-sm text-slate-500">
+                          Хадлан ашиглах хүсэлттэй холбоотой бүх төлбөрийг төлсөн бол тэмдэглэнэ үү.
+                        </span>
+                      </span>
+                    </label>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <Button
                 type="submit"
